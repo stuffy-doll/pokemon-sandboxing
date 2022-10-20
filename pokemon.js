@@ -1,7 +1,7 @@
 // POKEMON
 
 class Pokemon {
-  constructor(dexNo, name, sexless, species, baseStats, types, level, moves, ability, catchRate) {
+  constructor(dexNo, name, sexless, species, baseStats, types, level, moves, ability, catchRate, evolvesFrom, evolvesTo) {
     this.dexNo = dexNo;
     this.name = name;
     this.sexless = sexless;
@@ -35,6 +35,8 @@ class Pokemon {
     this.friendship = 0;
     this.catchRate = catchRate;
     this.stockpile = 0;
+    this.evolvesFrom = evolvesFrom;
+    this.evolvesTo = evolvesTo;
   };
 
   applyNature() {
@@ -43,6 +45,11 @@ class Pokemon {
     };
     this.stats[this.nature.buff] = Math.floor(this.stats[this.nature.buff] * 1.1);
     this.stats[this.nature.nerf] = Math.floor(this.stats[this.nature.nerf] * 0.9);
+    return;
+  };
+
+  applyNickname(value) {
+    this.nickname = value;
     return;
   };
 };
@@ -102,3 +109,43 @@ const natures = [
   modest, mild, quiet, bashful, rash,
   calm, gentle, sassy, careful, quirky,
 ];
+
+// MOVES
+
+class Move {
+  constructor(name, cat, type, acc, pow, pp, ppMax, contact, effects, priority) {
+    this.name = name;
+    this.cat = cat;
+    this.type = type;
+    this.acc = acc;
+    this.pow = pow;
+    this.pp = pp,
+      this.ppMax = ppMax;
+    this.contact = contact;
+    this.effects = effects;
+    this.priority = priority;
+  };
+
+  applyStatus(pokemon) {
+    const result = {
+      "messages": []
+    };
+    this.effects.effect.forEach(effect => {
+      if (effect === "buff") {
+        this.effects.stat.buff.forEach(stat => {
+          result.messages.push(`${pokemon.name}'s ${stat} stat was raised!`);
+          pokemon.stats[stat] = Math.floor(pokemon.stats[stat] * this.effects.multipliers.buff);
+        });
+      };
+      if (effect === "nerf") {
+        this.effects.stat.nerf.forEach(stat => {
+          result.messages.push(`${pokemon.name}'s ${stat} stat was lowered!`);
+          pokemon.stats[stat] = Math.floor(pokemon.stats[stat] * this.effects.multipliers.nerf);
+        });
+      };
+      if (effect === "stockpile") {
+        pokemon.stockpile++;
+      };
+    });
+  };
+};
