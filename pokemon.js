@@ -323,3 +323,72 @@ class Weather {
     this.persists = persists;
   };
 };
+
+// TRAINER
+
+class Trainer {
+  constructor(name) {
+    this.name = name;
+    this.trainerId = this.randomId();
+    this.secretId = this.randomId();
+    this.startedJourney = new Date(Date.now());
+  };
+
+  randomId() {
+    return Math.random().toString().split('.').join('').slice(3, 10);
+  };
+
+  throwBall(ball, pokemon) {
+    const result = {
+      "outcome": false,
+      "message": "Aww! It broke free!"
+    };
+
+    const C = pokemon.catchRate;
+    const HPMAX = pokemon.stats.hp;
+    const HPCURR = pokemon.hitPoints;
+    const BALL = ball.multipler;
+    const STATUS = pokemon.status.multiplier;
+
+    const X = ((3 * HPMAX - 2 * HPCURR) * (C * BALL) / 3 * HPMAX) * STATUS;
+    const chance = Math.floor(((65535 / Math.sqrt(Math.sqrt(255 / X))) / 8));
+
+    const caught = this.capture(0, chance);
+
+    if (caught) {
+      pokemon.ot = this.info();
+      result.outcome = true;
+      result.message = "Pokemon captured!";
+      return result;
+    };
+
+    return result;
+  };
+
+  randomCatchInt() {
+    const max = 65536;
+    return Math.floor(Math.random() * max);
+  };
+
+  capture(wobbles = 0, catchChance) {
+    // Catch chance fed in battle
+    let ranNum = this.randomCatchInt();
+    let caught = false;
+    if (ranNum >= catchChance) {
+      return caught;
+    };
+    if (wobbles === 4) {
+      caught = true;
+      return caught;
+    };
+    ranNum = this.randomCatchInt();
+    return this.capture(wobbles += 1, catchChance)
+  };
+
+  info() {
+    return {
+      "name": this.name,
+      "trainerId": this.trainerId,
+    }
+  }
+}
