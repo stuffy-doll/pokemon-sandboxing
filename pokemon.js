@@ -421,5 +421,51 @@ class Trainer {
       "name": this.name,
       "trainerId": this.trainerId,
     }
-  }
-}
+  };
+};
+
+// ABILITIES
+
+class Ability {
+  constructor(name, description, effect, passiveEffect) {
+    this.name = name;
+    this.description = description;
+    this.effect = effect;
+    this.passiveEffect = passiveEffect;
+    this.counters = 0;
+  };
+
+  trigger(pokemon) {
+    this.effect(pokemon);
+  };
+};
+
+const lightningRod = new Ability(
+  "Lightning Rod",
+  "If the user is hit with an electric type move, their special attack stat is raised.",
+  (pokemon => {
+    pokemon.stats.spa = pokemon.stats.spa * 1.5;
+  }),
+  null
+);
+
+const flameBody = new Ability(
+  "Flame Body",
+  "When the user is hit with a contact move, there is a chance to cause a burn to the attacker.",
+  (attacker => {
+    const base = 255;
+    const num = Math.floor(Math.random() * Math.sqrt(base));
+    if (num > base) {
+      attacker.status = burn;
+    };
+  }),
+  ((trainer) => {
+    if (trainer.party.includes(this)) {
+      trainer.party.forEach(slot => {
+        if (slot.egg) {
+          slot.hatch = slot.hatch / 2;
+        };
+      });
+    };
+  })
+)
