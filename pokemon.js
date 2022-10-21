@@ -157,9 +157,10 @@ class Battle {
     this.activeTrainer = activeTrainer;
     this.activeTeam = activeTeam;
     this.activeOpponent = activeOpponent;
-    this.field = this.field;
+    this.field = field;
     this.turnCount = 0;
     this.log = [];
+    this.fleeAttempts = 0
   };
 
   checkField() {
@@ -306,6 +307,36 @@ class Battle {
     };
     return result;
   };
+
+  determineFlee() {
+    // Declare a result for the calculation and initialize it as false
+    const result = {
+      "outcome": false,
+      "message": "You couldn't get away!"
+    }
+    // If the opponent has an OT (Meaning the battle is a trainer battle).
+    if (this.activeOpponent.ot) {
+      // Return a false result with a message explaining.
+      result.message = "No! There's no running from a trainer battle!"
+      return result;
+    };
+    // If the active team partner's speed is greater than that of the opponent's OR the active team partner is holding the Smoke Ball
+    if (this.activeTeam.stats.spe >= this.activeOpponent.stats.spe || this.activeTeam.heldItem.name === "Smoke Ball") {
+      // NOTE: Seperate the Smoke Ball to provide a unique message to an escape.
+      result.outcome = true;
+      result.message = "You got away safely!"
+      return result;
+    };
+    // Calculate the odds of escaping: Escape = Math.sqrt(TEAMSPEED * 32 / Math.sqrt(WILDSPEED / 4) MOD 256) + 30 * ATTEMPTS
+    const escape = Math.sqrt(this.activeTeam.stats.spe * 32 / Math.sqrt(this.activeOpponent.stats.spe / 4) % 256) + 30 * this.fleeAttempts;
+    // If the escape odds are greater than the flat escape rate
+    if (escape > 255) {
+      result.outcome = true;
+      result.message = "You got away safely!"
+      return result;
+    };
+    return result;
+  }
 
   battleLog() {
     return this.log;
