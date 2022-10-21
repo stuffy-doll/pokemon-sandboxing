@@ -149,3 +149,177 @@ class Move {
     });
   };
 };
+
+// BATTLE
+
+class Battle {
+  constructor(activeTrainer, activeTeam, activeOpponent, field) {
+    this.activeTrainer = activeTrainer;
+    this.activeTeam = activeTeam;
+    this.activeOpponent = activeOpponent;
+    this.field = this.field;
+    this.turnCount = 0;
+    this.log = [];
+  };
+
+  checkField() {
+    if (!this.field) return;
+    if (this.field.persists) return;
+    if (this.field.duration === 0) {
+      this.field = null;
+      return;
+    };
+    this.field.duration--;
+  };
+
+  determineTypeMultiplier(attack, target) {
+    const superEffective = {
+      "Normal": [null],
+      "Fire": ["Grass", "Ice", "Bug", "Steel"],
+      "Water": ["Fire", "Ground", "Rock"],
+      "Electric": ["Water", "Flying"],
+      "Grass": ["Water", "Ground", "Rock"],
+      "Ice": ["Grass", "Ground", "Flying", "Dragon"],
+      "Fighting": ["Normal", "Ice", "Rock", "Dark", "Steel"],
+      "Poison": ["Grass", "Fairy"],
+      "Ground": ["Fire", "Electric", "Poison", "Rock", "Steel"],
+      "Flying": ["Grass", "Fighting", "Bug"],
+      "Psychic": ["Fighting", "Poison"],
+      "Bug": ["Grass", "Psychic", "Dark"],
+      "Rock": ["Fire", "Ice", "Flying", "Bug"],
+      "Ghost": ["Psychic", "Ghost"],
+      "Dragon": ["Dragon"],
+      "Dark": ["Psychic", "Ghost"],
+      "Steel": ["Ice", "Rock", "Fairy"],
+      "Fairy": ["Fighting", "Dragon", "Dark"]
+    };
+
+    const notEffective = {
+      "Normal": ["Rock", "Steel"],
+      "Fire": ["Fire", "Water", "Rock", "Dragon"],
+      "Water": ["Water", "Grass", "Dragon"],
+      "Electric": ["Electric", "Grass", "Dragon"],
+      "Grass": ["Electric", "Grass", "Dragon"],
+      "Ice": ["Fire", "Water", "Ice", "Steel"],
+      "Fighting": ["Poison", "Flying", "Psychic", "Bug", "Fairy"],
+      "Poison": ["Poison", "Ground", "Rock", "Ghost"],
+      "Ground": ["Grass", "Bug"],
+      "Flying": ["Electric", "Rock", "Steel"],
+      "Psychic": ["Psychic", "Steel"],
+      "Bug": ["Water", "Fighting", "Poison", "Ghost", "Steel", "Fairy"],
+      "Rock": ["Fighting", "Ground", "Steel"],
+      "Ghost": ["Dark"],
+      "Dragon": ["Steel"],
+      "Dark": ["Fighting", "Dark", "Fairy"],
+      "Steel": ["Fire", "Water", "Electric", "Steel"],
+      "Fairy": ["Fire", "Poison", "Steel"]
+    };
+
+    const noEffect = {
+      "Normal": ["Ghost"],
+      "Fire": [null],
+      "Water": [null],
+      "Electric": ["Ground"],
+      "Grass": [null],
+      "Ice": [null],
+      "Fighting": ["Ghost"],
+      "Poison": ["Steel"],
+      "Ground": ["Flying"],
+      "Flying": [null],
+      "Psychic": ["Dark"],
+      "Bug": [null],
+      "Rock": [null],
+      "Ghost": ["Normal"],
+      "Dragon": ["Fairy"],
+      "Dark": [null],
+      "Steel": [null],
+      "Fairy": [null]
+    };
+
+    const result = {
+      message: null,
+      multiplier: 1
+    };
+    const moveType = attack.type;
+    const targetTypes = target.types;
+
+    if (targetTypes.length === 1) {
+      if (superEffective[moveType].includes(targetTypes[0])) {
+        result.message = "It's super effective!";
+        result.multiplier = 2;
+      } else if (notEffective[moveType].includes(targetTypes[0])) {
+        result.message = "It's not very effective...";
+        result.multiplier = 0.5;
+      } else if (noEffect[moveType].includes(targetTypes[0])) {
+        return result;
+      };
+    } else {
+      if (noEffect[moveType].includes(targetTypes[0]) || noEffect[moveType].includes(targetTypes[1])) {
+        result.message = "It had no effect..."
+        return result;
+      } else if (superEffective[moveType].includes(targetTypes[0]) && superEffective[moveType].includes(targetTypes[1])) {
+        result.message = "It's critically effective!";
+        result.multiplier = 4;
+      } else if (superEffective[moveType].includes(targetTypes[0] && notEffective[moveType].includes(targetTypes[1]))) {
+        return result;
+      } else if (notEffective[moveType].includes(targetTypes[0] || notEffective[moveType].includes(targetTypes[1]))) {
+        result.message = "It's not very effective...";
+        result.multiplier = 0.5
+      } else if (notEffective[moveType].includes(targetTypes[0]) && notEffective[moveType].includes(targetTypes[1])) {
+        result.message = "It barely had an effect...";
+        result.multiplier = 0.25
+      };
+    };
+    return result;
+  };
+
+  determineWeatherMultipliers = (moveType) => {
+    const weatherBoost = {
+      "sunlight": ["Fire", "Grass"],
+      "moonlight": ["Fairy", "Dark"],
+      "rain": ["Water", "Grass"],
+      "fog": [null],
+      "hail": ["Ice"],
+      "sandstorm": ["Ground", "Rock"]
+    };
+
+    const weatherNerf = {
+      "sunlight": ["Water", "Ice"],
+      "moonlight": [null],
+      "rain": ["Fire"],
+      "fog": [null],
+      "hail": ["Fire"],
+      "sandstorm": ["Fire", "Flying"]
+    };
+
+    let result = 1;
+    if (this.field === null) {
+      return result;
+    };
+    if (weatherBoost[this.field.shorthand].includes(moveType)) {
+      result = 1.5;
+      return result;
+    };
+    if (weatherNerf[this.field.shorthand].includes(moveType)) {
+      result = 0.5;
+      return result;
+    };
+    return result;
+  };
+
+  battleLog() {
+    return this.log;
+  };
+};
+
+// WEATHER
+
+class Weather {
+  constructor(name, shorthand, duration, message, persists) {
+    this.name = name;
+    this.shorthand = shorthand;
+    this.duration = this.persists === true ? Infinity : duration;
+    this.message = message;
+    this.persists = persists;
+  };
+};
