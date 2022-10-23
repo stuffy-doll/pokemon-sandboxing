@@ -54,6 +54,16 @@ class Pokemon {
   };
 };
 
+// EGG
+
+// class Egg {
+//   constructor(baseHatch, hatchesInto) {
+//     this.baseHatch = baseHatch;
+//     this.hatch = Math.floor(baseHatch * hatchesInto.dexNo);
+//     this.hatchesInto = hatchesInto;
+//   };
+// };
+
 // NATURES
 
 class Nature {
@@ -433,6 +443,8 @@ class Ability {
     this.effect = effect;
     this.passiveEffect = passiveEffect;
     this.counters = 0;
+    this.contactTrigger = false;
+    this.weatherTrigger = false;
   };
 
   trigger(pokemon) {
@@ -469,3 +481,43 @@ const flameBody = new Ability(
     };
   })
 )
+
+// MEDICINE
+
+class Medicine {
+  constructor(name, description, effect, price, messages) {
+    this.name = name;
+    this.description = description;
+    this.effect = effect;
+    this.price = price;
+    this.messages = messages;
+  };
+
+  use(pokemon) {
+    const final = this.effect(pokemon);
+    if (!final) {
+      return this.messages.failure;
+    };
+    return this.messages.success;
+  };
+};
+
+const potion = new Medicine(
+  "Potion",
+  "Restores 20 HP",
+  ((pokemon) => {
+    if (pokemon.hitPoints === pokemon.stats.hp) {
+      return false;
+    };
+    pokemon.hitPoints += 20;
+    if (pokemon.hitPoints > pokemon.stats.hp) {
+      pokemon.hitPoints = pokemon.stats.hp;
+    };
+    return true;
+  }),
+  200,
+  {
+    "failure": "The Pokemon's HP is full!",
+    "success": "The Pokemon restored 20 HP!"
+  }
+);
