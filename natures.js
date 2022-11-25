@@ -7,8 +7,8 @@ and also determines a Pokemon's favorite/least favorite berry flavor.
 class Nature {
   constructor(nature, bonus, penalty, favors, dislikes) {
     this.nature = nature;
-    this.bonus = buff;
-    this.penalty = nerf;
+    this.bonus = bonus;
+    this.penalty = penalty;
     this.favorite = favors;
     this.dislikes = dislikes;
   };

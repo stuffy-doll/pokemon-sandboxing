@@ -1,10 +1,11 @@
 const { natures } = require('./natures');
+const { hpTypes } = require('./hpTypes');
 
 // POKEMON
 
 class Pokemon {
 
-  constructor(dexNo, name, sexless, species, baseStats, types, level, moves, ability, catchRate, evolvesFrom, evolvesTo) {
+  constructor(dexNo, name, sexless, species, baseStats, types, level, learnset, ability, catchRate, evolvesFrom, evolvesTo) {
     this.dexNo = dexNo;
     this.name = name;
     this.sexless = sexless;
@@ -48,6 +49,7 @@ class Pokemon {
       acc: 100,
       eva: 100
     };
+    this.hiddenPowerType = hpTypes[this.hiddenPowerCalc()]; // Calls the method to determine hidden power type based on IV spread
     this.ability = ability;
     this.ot = null; // Method will assign trainer when caught
     this.exp = null; // TODO: Figure out calculation based on level
@@ -62,6 +64,25 @@ class Pokemon {
     this.evolvesFrom = evolvesFrom;
     this.evolvesTo = evolvesTo;
   };
+
+  // Method to calculate the hidden power type of the Pokemon
+  hiddenPowerCalc() {
+    // Extract the IV values for each stat
+    const values = Object.values(this.ivs);
+    // Declare an empty list to store binary values
+    const binaries = []
+    // Iterate through the values
+    values.forEach(value => {
+      // If the value is odd, then push 0 for the value, else push 1
+      value % 2 === 0 ? binaries.push(0) : binaries.push(1);
+    });
+    // Deconstruct to make code more succinct
+    const [hp, atk, def, spe, spa, spd] = binaries;
+    // Calcluate (formula: Floor(1hp + 2atk + 4def + 8spe + 16spa + 32spd) * 15 / 63)
+    const sum = Math.floor((1 * hp + 2 * atk + 4 * def + 8 * spe + 16 * spa + 32 * spd) * 15 / 63);
+    // Return the sum to use as type list index (Always 0-15 in value)
+    return sum;
+  }
 
   applyNickname(value) {
     this.nickname = value;
@@ -79,250 +100,7 @@ class Pokemon {
 //   };
 // };
 
-// MOVES
 
-class Move {
-  constructor(name, cat, type, acc, pow, pp, ppMax, contact, effects, priority) {
-    this.name = name;
-    this.cat = cat;
-    this.type = type;
-    this.acc = acc;
-    this.pow = pow;
-    this.pp = pp,
-      this.ppMax = ppMax;
-    this.contact = contact;
-    this.effects = effects;
-    this.priority = priority;
-  };
-
-  applyStatus(pokemon) {
-    const result = {
-      "messages": []
-    };
-    this.effects.effect.forEach(effect => {
-      if (effect === "buff") {
-        this.effects.stat.buff.forEach(stat => {
-          result.messages.push(`${pokemon.name}'s ${stat} stat was raised!`);
-          pokemon.stats[stat] = Math.floor(pokemon.stats[stat] * this.effects.multipliers.buff);
-        });
-      };
-      if (effect === "nerf") {
-        this.effects.stat.nerf.forEach(stat => {
-          result.messages.push(`${pokemon.name}'s ${stat} stat was lowered!`);
-          pokemon.stats[stat] = Math.floor(pokemon.stats[stat] * this.effects.multipliers.nerf);
-        });
-      };
-      if (effect === "stockpile") {
-        pokemon.stockpile++;
-      };
-    });
-  };
-};
-
-// BATTLE
-
-class Battle {
-  constructor(activeTrainer, activeTeam, activeOpponent, field) {
-    this.activeTrainer = activeTrainer;
-    this.activeTeam = activeTeam;
-    this.activeOpponent = activeOpponent;
-    this.field = field;
-    this.turnCount = 0;
-    this.log = [];
-    this.fleeAttempts = 0
-  };
-
-  checkField() {
-    if (!this.field) return;
-    if (this.field.persists) return;
-    if (this.field.duration === 0) {
-      this.field = null;
-      return;
-    };
-    this.field.duration--;
-  };
-
-  determineTypeMultiplier(attack, target) {
-    const superEffective = {
-      "Normal": [null],
-      "Fire": ["Grass", "Ice", "Bug", "Steel"],
-      "Water": ["Fire", "Ground", "Rock"],
-      "Electric": ["Water", "Flying"],
-      "Grass": ["Water", "Ground", "Rock"],
-      "Ice": ["Grass", "Ground", "Flying", "Dragon"],
-      "Fighting": ["Normal", "Ice", "Rock", "Dark", "Steel"],
-      "Poison": ["Grass", "Fairy"],
-      "Ground": ["Fire", "Electric", "Poison", "Rock", "Steel"],
-      "Flying": ["Grass", "Fighting", "Bug"],
-      "Psychic": ["Fighting", "Poison"],
-      "Bug": ["Grass", "Psychic", "Dark"],
-      "Rock": ["Fire", "Ice", "Flying", "Bug"],
-      "Ghost": ["Psychic", "Ghost"],
-      "Dragon": ["Dragon"],
-      "Dark": ["Psychic", "Ghost"],
-      "Steel": ["Ice", "Rock", "Fairy"],
-      "Fairy": ["Fighting", "Dragon", "Dark"]
-    };
-
-    const notEffective = {
-      "Normal": ["Rock", "Steel"],
-      "Fire": ["Fire", "Water", "Rock", "Dragon"],
-      "Water": ["Water", "Grass", "Dragon"],
-      "Electric": ["Electric", "Grass", "Dragon"],
-      "Grass": ["Electric", "Grass", "Dragon"],
-      "Ice": ["Fire", "Water", "Ice", "Steel"],
-      "Fighting": ["Poison", "Flying", "Psychic", "Bug", "Fairy"],
-      "Poison": ["Poison", "Ground", "Rock", "Ghost"],
-      "Ground": ["Grass", "Bug"],
-      "Flying": ["Electric", "Rock", "Steel"],
-      "Psychic": ["Psychic", "Steel"],
-      "Bug": ["Water", "Fighting", "Poison", "Ghost", "Steel", "Fairy"],
-      "Rock": ["Fighting", "Ground", "Steel"],
-      "Ghost": ["Dark"],
-      "Dragon": ["Steel"],
-      "Dark": ["Fighting", "Dark", "Fairy"],
-      "Steel": ["Fire", "Water", "Electric", "Steel"],
-      "Fairy": ["Fire", "Poison", "Steel"]
-    };
-
-    const noEffect = {
-      "Normal": ["Ghost"],
-      "Fire": [null],
-      "Water": [null],
-      "Electric": ["Ground"],
-      "Grass": [null],
-      "Ice": [null],
-      "Fighting": ["Ghost"],
-      "Poison": ["Steel"],
-      "Ground": ["Flying"],
-      "Flying": [null],
-      "Psychic": ["Dark"],
-      "Bug": [null],
-      "Rock": [null],
-      "Ghost": ["Normal"],
-      "Dragon": ["Fairy"],
-      "Dark": [null],
-      "Steel": [null],
-      "Fairy": [null]
-    };
-
-    const result = {
-      message: null,
-      multiplier: 1
-    };
-    const moveType = attack.type;
-    const targetTypes = target.types;
-
-    if (targetTypes.length === 1) {
-      if (superEffective[moveType].includes(targetTypes[0])) {
-        result.message = "It's super effective!";
-        result.multiplier = 2;
-      } else if (notEffective[moveType].includes(targetTypes[0])) {
-        result.message = "It's not very effective...";
-        result.multiplier = 0.5;
-      } else if (noEffect[moveType].includes(targetTypes[0])) {
-        return result;
-      };
-    } else {
-      if (noEffect[moveType].includes(targetTypes[0]) || noEffect[moveType].includes(targetTypes[1])) {
-        result.message = "It had no effect..."
-        return result;
-      } else if (superEffective[moveType].includes(targetTypes[0]) && superEffective[moveType].includes(targetTypes[1])) {
-        result.message = "It's critically effective!";
-        result.multiplier = 4;
-      } else if (superEffective[moveType].includes(targetTypes[0] && notEffective[moveType].includes(targetTypes[1]))) {
-        return result;
-      } else if (notEffective[moveType].includes(targetTypes[0] || notEffective[moveType].includes(targetTypes[1]))) {
-        result.message = "It's not very effective...";
-        result.multiplier = 0.5
-      } else if (notEffective[moveType].includes(targetTypes[0]) && notEffective[moveType].includes(targetTypes[1])) {
-        result.message = "It barely had an effect...";
-        result.multiplier = 0.25
-      };
-    };
-    return result;
-  };
-
-  determineWeatherMultipliers = (moveType) => {
-    const weatherBoost = {
-      "sunlight": ["Fire", "Grass"],
-      "moonlight": ["Fairy", "Dark"],
-      "rain": ["Water", "Grass"],
-      "fog": [null],
-      "hail": ["Ice"],
-      "sandstorm": ["Ground", "Rock"]
-    };
-
-    const weatherNerf = {
-      "sunlight": ["Water", "Ice"],
-      "moonlight": [null],
-      "rain": ["Fire"],
-      "fog": [null],
-      "hail": ["Fire"],
-      "sandstorm": ["Fire", "Flying"]
-    };
-
-    let result = 1;
-    if (this.field === null) {
-      return result;
-    };
-    if (weatherBoost[this.field.shorthand].includes(moveType)) {
-      result = 1.5;
-      return result;
-    };
-    if (weatherNerf[this.field.shorthand].includes(moveType)) {
-      result = 0.5;
-      return result;
-    };
-    return result;
-  };
-
-  determineFlee() {
-    // Declare a result for the calculation and initialize it as false
-    const result = {
-      "outcome": false,
-      "message": "You couldn't get away!"
-    }
-    // If the opponent has an OT (Meaning the battle is a trainer battle).
-    if (this.activeOpponent.ot) {
-      // Return a false result with a message explaining.
-      result.message = "No! There's no running from a trainer battle!"
-      return result;
-    };
-    // If the active team partner's speed is greater than that of the opponent's OR the active team partner is holding the Smoke Ball
-    if (this.activeTeam.stats.spe >= this.activeOpponent.stats.spe || this.activeTeam.heldItem.name === "Smoke Ball") {
-      // NOTE: Seperate the Smoke Ball to provide a unique message to an escape.
-      result.outcome = true;
-      result.message = "You got away safely!"
-      return result;
-    };
-    // Calculate the odds of escaping: Escape = Math.sqrt(TEAMSPEED * 32 / Math.sqrt(WILDSPEED / 4) MOD 256) + 30 * ATTEMPTS
-    const escape = Math.sqrt(this.activeTeam.stats.spe * 32 / Math.sqrt(this.activeOpponent.stats.spe / 4) % 256) + 30 * this.fleeAttempts;
-    // If the escape odds are greater than the flat escape rate
-    if (escape > 255) {
-      result.outcome = true;
-      result.message = "You got away safely!"
-      return result;
-    };
-    return result;
-  };
-
-  battleLog() {
-    return this.log;
-  };
-};
-
-// WEATHER
-
-class Weather {
-  constructor(name, shorthand, duration, message, persists) {
-    this.name = name;
-    this.shorthand = shorthand;
-    this.duration = this.persists === true ? Infinity : duration;
-    this.message = message;
-    this.persists = persists;
-  };
-};
 
 // TRAINER
 
@@ -500,10 +278,3 @@ class Action {
     };
   };
 };
-
-const attack = new Action(
-  "move",
-  new Move(
-
-  )
-);
