@@ -57,3 +57,5 @@ const natures = [
   modest, mild, quiet, bashful, rash,
   calm, gentle, sassy, careful, quirky,
 ];
+
+module.exports.natures = natures;
