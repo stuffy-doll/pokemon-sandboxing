@@ -1,3 +1,5 @@
+const { natures } = require('./natures');
+
 // POKEMON
 
 class Pokemon {
@@ -39,9 +41,10 @@ class Pokemon {
       spa: Math.floor(((2 * this.baseStats["spa"] + this.ivs["spa"] * this.level) / 100) + 5 * (this.nature.buff === "spa" ? 1.1 : 1 || this.nature.nerf === "spa" ? 0.9 : 1)),
       spd: Math.floor(((2 * this.baseStats["spd"] + this.ivs["spd"] * this.level) / 100) + 5 * (this.nature.buff === "spd" ? 1.1 : 1 || this.nature.nerf === "spd" ? 0.9 : 1)),
     };
-    // Battle Stats (hitPoints represents the real value that will change during battle, acc represents the hidden accuracty stat, and eva the hidden evasion stat)
+    // Battle Stats (hitPoints represents the real value that will change during battle, abm represents any ability multipliers, acc represents the hidden accuracty stat, and eva the hidden evasion stat)
     this.battleStats = {
       hitPoints: this.stats.hp,
+      abm: 1,
       acc: 100,
       eva: 100
     };
@@ -58,15 +61,6 @@ class Pokemon {
     this.stockpile = 0;
     this.evolvesFrom = evolvesFrom;
     this.evolvesTo = evolvesTo;
-  };
-
-  applyNature() {
-    if (this.nature.buff === null) {
-      return;
-    };
-    this.stats[this.nature.buff] = Math.floor(this.stats[this.nature.buff] * 1.1);
-    this.stats[this.nature.nerf] = Math.floor(this.stats[this.nature.nerf] * 0.9);
-    return;
   };
 
   applyNickname(value) {
