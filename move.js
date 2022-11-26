@@ -9,8 +9,8 @@ class MOVE {
   constructor(name, description, cat, type, acc, pow, pp, ppCap, contact, effects, priority) {
     this.name = name;
     this.description = description;
-    this.cat = cat;
     this.type = type;
+    this.cat = cat;
     this.acc = acc;
     this.pow = pow;
     this.pp = pp;
@@ -41,15 +41,17 @@ class MOVE {
   }
 };
 
+// Moves
+
 const growl = new MOVE(
   "Growl",
   "The user growls in an endearing way, making opposing Pokemon less wary. This lowers their Attack stats.",
   "Normal",
   "Status",
+  100,
   null,
-  1,
   40,
-  54,
+  56,
   false,
   {
     // hasEffect is checked
@@ -60,4 +62,20 @@ const growl = new MOVE(
     })
   },
   1
-)
+);
+
+const scratch = new MOVE(
+  "Scratch",
+  "The user scratches with sharp claws.",
+  "Normal",
+  "Physical",
+  100,
+  35,
+  40,
+  56,
+  true,
+  {
+    "hasEffect": false,
+  },
+  1
+);
