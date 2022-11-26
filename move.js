@@ -5,7 +5,7 @@ Moves can perform a variety of actions. They can do damage to the opponenet to r
 swaps and more.
 */
 
-class Move {
+class MOVE {
   constructor(name, description, cat, type, acc, pow, pp, ppCap, contact, effects, priority) {
     this.name = name;
     this.description = description;
@@ -41,7 +41,7 @@ class Move {
   }
 };
 
-const growl = new Move(
+const growl = new MOVE(
   "Growl",
   "The user growls in an endearing way, making opposing Pokemon less wary. This lowers their Attack stats.",
   "Normal",
