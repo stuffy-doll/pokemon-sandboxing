@@ -5,13 +5,16 @@ class PKMN_TRAINER {
     this.name = name;
     this.gender = gender;
     this.began_journey = new Date(Date.now());
-    this.trainer_card = {
-      name: this.name,
-      gender: this.gender,
-      began_journey: this.began_journey,
-      money: this.money,
-      badges: this.badge_case,
-      greeting: null,
+    this.money = 1000;
+    this.badge_case = {
+      b_1: null,
+      b_2: null,
+      b_3: null,
+      b_4: null,
+      b_5: null,
+      b_6: null,
+      b_7: null,
+      b_8: null
     };
     this.team = {
       s_1: null,
@@ -27,17 +30,6 @@ class PKMN_TRAINER {
       "tms": {},
       "berries": {},
       "ball": {}
-    };
-    this.money = 1000;
-    this.badge_case = {
-      b_1: null,
-      b_2: null,
-      b_3: null,
-      b_4: null,
-      b_5: null,
-      b_6: null,
-      b_7: null,
-      b_8: null
     };
   };
 
@@ -188,4 +180,18 @@ class PKMN_TRAINER {
     // Recursively call the function, increasing the wobble count
     return this.capture(wobbles += 1, catchChance)
   };
+
+  trainerCard() {
+    return {
+      name: this.name,
+      gender: this.gender,
+      tid: this.tid,
+      began_journey: this.began_journey,
+      money: this.money,
+      badges: this.badge_case,
+      greeting: null,
+    }
+  }
 };
+
+module.exports.PKMN_TRAINER = PKMN_TRAINER;

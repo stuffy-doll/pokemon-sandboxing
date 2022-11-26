@@ -229,3 +229,5 @@ class BATTLE {
     return this.log;
   };
 };
+
+module.exports.BATTLE = BATTLE;

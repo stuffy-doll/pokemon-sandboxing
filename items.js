@@ -1,8 +1,9 @@
 // MEDICINE
 
 class MEDICINE {
-  constructor(name, description, effect, price, messages) {
+  constructor(name, shorthand, description, effect, price, messages) {
     this.name = name;
+    this.shorthand = shorthand;
     this.description = description;
     this.effect = effect;
     this.price = price;
@@ -20,6 +21,7 @@ class MEDICINE {
 
 const potion = new MEDICINE(
   "Potion",
+  "potion",
   "Basic Medicine that restores a small amount of a Pokemon's HP.",
   ((pokemon) => {
     if (pokemon.hitPoints === pokemon.stats.hp) {
@@ -40,6 +42,7 @@ const potion = new MEDICINE(
 
 const superPotion = new MEDICINE(
   "Super Potion",
+  "spotion",
   "Medicine that restores a decent amount of a Pokemon's HP.",
   ((pokemon) => {
     if (pokemon.battleStats.hitPoints === pokemon.stats.hp) {

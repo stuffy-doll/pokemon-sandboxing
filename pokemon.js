@@ -3,13 +3,12 @@ const { hpTypes } = require('./hpTypes');
 
 // POKEMON
 
-class Pokemon {
-
+class POKEMON {
   constructor(dexNo, name, sexless, species, baseStats, types, level, learnset, ability, catchRate, evolvesFrom, evolvesTo) {
     this.dexNo = dexNo;
     this.name = name;
     this.sexless = sexless;
-    this.gender = this.sexless === true ? null : ["Male", "Female"][Math.floor(Math.random() * ["Male", "Female"].length)]
+    this.gender = this.sexless === true ? null : ["Male", "Female"][Math.floor(Math.random() * 2)]
     this.nickname = null;
     this.species = species;
     this.baseStats = baseStats;
@@ -90,35 +89,4 @@ class Pokemon {
   };
 };
 
-// EGG
-
-// class Egg {
-//   constructor(baseHatch, hatchesInto) {
-//     this.baseHatch = baseHatch;
-//     this.hatch = Math.floor(baseHatch * hatchesInto.dexNo);
-//     this.hatchesInto = hatchesInto;
-//   };
-// };
-
-
-
-
-class Action {
-  constructor(type, move, ball, item, swap) {
-    this.type = type;
-    this.move = move;
-    this.ball = ball;
-    this.item = item;
-    this.swap = swap;
-  };
-
-  toSafeObject() {
-    return {
-      "type": this.type,
-      "move": this.move,
-      "ball": this.ball,
-      "item": this.item,
-      "swap": this.swap
-    };
-  };
-};
+module.exports.POKEMON = POKEMON;
