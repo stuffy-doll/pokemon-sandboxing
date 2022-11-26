@@ -4,7 +4,7 @@
 Battles intake several pieces of data to create an environment for which two Pokemon can compete with their data.
 */
 
-class Battle {
+class BATTLE {
   constructor(activeTrainer, activeTeam, activeOpponent, field) {
     this.activeTrainer = activeTrainer;
     this.activeTeam = activeTeam;
