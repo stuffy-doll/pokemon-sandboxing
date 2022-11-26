@@ -35,9 +35,9 @@ class POKEMON {
       // HP Calc = Floor((2 * BASE + IV * Level) / 100) + Level + 10
       // Stat Calc = Floor((2 * BASE + IV * Level) / 100) + 5 * Nature
       hp: Math.floor(((2 * this.baseStats["hp"] + this.ivs["hp"] * this.level) / 100) + this.level + 10),
-      atk: Math.floor(((2 * this.baseStats["atk"] + this.ivs["atk"] * this.level) / 100) + 5 * (this.nature.buff === "atk" ? 1.1 : 1 || this.nature.nerf === "atk" ? 0.9 : 1)),
-      def: Math.floor(((2 * this.baseStats["def"] + this.ivs["def"] * this.level) / 100) + 5 * (this.nature.buff === "def" ? 1.1 : 1 || this.nature.nerf === "def" ? 0.9 : 1)),
-      spe: Math.floor(((2 * this.baseStats["spe"] + this.ivs["spe"] * this.level) / 100) + 5 * (this.nature.buff === "spe" ? 1.1 : 1 || this.nature.nerf === "spe" ? 0.9 : 1)),
+      atk: Math.floor(((2 * this.baseStats["atk"] + this.ivs["atk"] * this.level) / 100) + 5 * (this.nature.buff === "atk" ? 1.1 : 1 || this.nature.nerf === "atk" ? 0.9 : 1) * ((this.status && this.status.shorthand === "BRN") ? this.status.penalty : 1)),
+      def: Math.floor(((2 * this.baseStats["def"] + this.ivs["def"] * this.level) / 100) + 5 * (this.nature.buff === "def" ? 1.1 : 1 || this.nature.nerf === "def" ? 0.9 : 1) * ((this.status && this.status.shorthand === "SLP") ? this.status.penalty : 1)),
+      spe: Math.floor(((2 * this.baseStats["spe"] + this.ivs["spe"] * this.level) / 100) + 5 * (this.nature.buff === "spe" ? 1.1 : 1 || this.nature.nerf === "spe" ? 0.9 : 1) * ((this.status && this.status.shorthand === "PRLZ") ? this.status.penalty : 1)),
       spa: Math.floor(((2 * this.baseStats["spa"] + this.ivs["spa"] * this.level) / 100) + 5 * (this.nature.buff === "spa" ? 1.1 : 1 || this.nature.nerf === "spa" ? 0.9 : 1)),
       spd: Math.floor(((2 * this.baseStats["spd"] + this.ivs["spd"] * this.level) / 100) + 5 * (this.nature.buff === "spd" ? 1.1 : 1 || this.nature.nerf === "spd" ? 0.9 : 1)),
     };
@@ -46,7 +46,7 @@ class POKEMON {
       hitPoints: this.stats.hp,
       abm: 1,
       acc: 100,
-      eva: 100
+      eva: 100,
     };
     this.hiddenPowerType = hpTypes[this.hiddenPowerCalc()]; // Calls the method to determine hidden power type based on IV spread
     this.ability = ability;
