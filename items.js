@@ -1,3 +1,7 @@
+class GENERAL_ITEM {
+  constructor(name, shorthand, description,)
+}
+
 // MEDICINE
 
 class MEDICINE {
@@ -60,3 +64,14 @@ const superPotion = new MEDICINE(
     "success": "The Pokemon restored 20 HP!"
   }
 );
+
+const rareCandy = new MEDICINE(
+  "Rare Candy",
+  "rarecandy",
+  "A rare sweet with strengthening properties. Raises a Pokemon's level by 1.",
+  ((pokemon) => {
+    expGain = pokemon.expGain[pokemon.level + 1] - pokemon.exp;
+    pokemon.exp += expGain;
+    pokemon.levelUp();
+  })
+)
