@@ -35,9 +35,9 @@ class POKEMON {
       // HP Calc = Floor((2 * BASE + IV * Level) / 100) + Level + 10
       // Stat Calc = Floor((2 * BASE + IV * Level) / 100) + 5 * Nature
       hp: Math.floor(((2 * this.baseStats["hp"] + this.ivs["hp"] * this.level) / 100) + this.level + 10),
-      atk: Math.floor(((2 * this.baseStats["atk"] + this.ivs["atk"] * this.level) / 100) + 5 * (this.nature.buff === "atk" ? 1.1 : 1 || this.nature.nerf === "atk" ? 0.9 : 1) * ((this.status && this.status.shorthand === "BRN") ? this.status.penalty : 1)),
-      def: Math.floor(((2 * this.baseStats["def"] + this.ivs["def"] * this.level) / 100) + 5 * (this.nature.buff === "def" ? 1.1 : 1 || this.nature.nerf === "def" ? 0.9 : 1) * ((this.status && this.status.shorthand === "SLP") ? this.status.penalty : 1)),
-      spe: Math.floor(((2 * this.baseStats["spe"] + this.ivs["spe"] * this.level) / 100) + 5 * (this.nature.buff === "spe" ? 1.1 : 1 || this.nature.nerf === "spe" ? 0.9 : 1) * ((this.status && this.status.shorthand === "PRLZ") ? this.status.penalty : 1)),
+      atk: Math.floor(((2 * this.baseStats["atk"] + this.ivs["atk"] * this.level) / 100) + 5 * (this.nature.buff === "atk" ? 1.1 : 1 || this.nature.nerf === "atk" ? 0.9 : 1)),
+      def: Math.floor(((2 * this.baseStats["def"] + this.ivs["def"] * this.level) / 100) + 5 * (this.nature.buff === "def" ? 1.1 : 1 || this.nature.nerf === "def" ? 0.9 : 1)),
+      spe: Math.floor(((2 * this.baseStats["spe"] + this.ivs["spe"] * this.level) / 100) + 5 * (this.nature.buff === "spe" ? 1.1 : 1 || this.nature.nerf === "spe" ? 0.9 : 1)),
       spa: Math.floor(((2 * this.baseStats["spa"] + this.ivs["spa"] * this.level) / 100) + 5 * (this.nature.buff === "spa" ? 1.1 : 1 || this.nature.nerf === "spa" ? 0.9 : 1)),
       spd: Math.floor(((2 * this.baseStats["spd"] + this.ivs["spd"] * this.level) / 100) + 5 * (this.nature.buff === "spd" ? 1.1 : 1 || this.nature.nerf === "spd" ? 0.9 : 1)),
     };
@@ -81,6 +81,25 @@ class POKEMON {
     const sum = Math.floor((1 * hp + 2 * atk + 4 * def + 8 * spe + 16 * spa + 32 * spd) * 15 / 63);
     // Return the sum to use as type list index (Always 0-15 in value)
     return sum;
+  };
+
+  levelUp() {
+    this.level++;
+    console.log(this.level);
+    const hpGain = Math.floor(((2 * this.baseStats["hp"] + this.ivs["hp"] * this.level) / 100) - this.level + 10) - this.stats.hp;
+    const atkGain = Math.floor(((2 * this.baseStats["atk"] + this.ivs["atk"] * this.level) / 100) + 5 * (this.nature.buff === "atk" ? 1.1 : 1 || this.nature.nerf === "atk" ? 0.9 : 1)) - this.stats.atk;
+    const defGain = Math.floor(((2 * this.baseStats["def"] + this.ivs["def"] * this.level) / 100) + 5 * (this.nature.buff === "def" ? 1.1 : 1 || this.nature.nerf === "def" ? 0.9 : 1)) - this.stats.def;
+    const speGain = Math.floor(((2 * this.baseStats["spe"] + this.ivs["spe"] * this.level) / 100) + 5 * (this.nature.buff === "spe" ? 1.1 : 1 || this.nature.nerf === "spe" ? 0.9 : 1)) - this.stats.spe;
+    const spaGain = Math.floor(((2 * this.baseStats["spa"] + this.ivs["spa"] * this.level) / 100) + 5 * (this.nature.buff === "spa" ? 1.1 : 1 || this.nature.nerf === "spa" ? 0.9 : 1)) - this.stats.spa;
+    const spdGain = Math.floor(((2 * this.baseStats["spd"] + this.ivs["spd"] * this.level) / 100) + 5 * (this.nature.buff === "spd" ? 1.1 : 1 || this.nature.nerf === "spd" ? 0.9 : 1)) - this.stats.spd;
+    return {
+      hpGain,
+      atkGain,
+      defGain,
+      speGain,
+      spaGain,
+      spdGain,
+    }
   }
 
   applyNickname(value) {

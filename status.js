@@ -6,7 +6,7 @@ class STATUS {
     this.penalty = penalty;
     this.effect = effect;
     this.sleepCount = 0;
-    this.poisonBuild = 1.5;
+    this.toxBuild = 1.5;
   }
 
   applyEffect(pokemon) {
@@ -70,9 +70,9 @@ const toxic = new STATUS(
   Infinity,
   null,
   ((pokemon) => {
-    poisonAccum = (pokemon.stats.hp / 16) * this.poisonBuild;
-    pokemon.battleStats.hitPoints -= poisonAccum;
-    this.poisonBuild += 0.5;
-    return poisonAccum;
+    toxAccum = (pokemon.stats.hp / 16) * this.toxBuild;
+    pokemon.battleStats.hitPoints -= toxAccum;
+    this.toxBuild += 0.5;
+    return toxAccum;
   })
 )
