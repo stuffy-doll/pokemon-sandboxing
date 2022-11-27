@@ -9,6 +9,7 @@ const erratic = {
   6: { toNext: 637 },
   7: { toNext: 942 },
   8: { toNext: 1326 },
+  // And so on...
   9: { toNext: 1800 },
   10: { toNext: 2369 },
   11: { toNext: 3041 },
@@ -102,3 +103,7 @@ const erratic = {
   99: { toNext: 600000 },
   100: { toNext: null },
 }
+
+module.exports.expGraphs = {
+  erratic
+};
