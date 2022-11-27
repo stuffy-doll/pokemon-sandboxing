@@ -34,12 +34,12 @@ class POKEMON {
     this.stats = {
       // HP Calc = Floor((2 * BASE + IV * Level) / 100) + Level + 10
       // Stat Calc = Floor((2 * BASE + IV * Level) / 100) + 5 * Nature
-      hp: Math.floor(((2 * this.baseStats["hp"] + this.ivs["hp"] * this.level) / 100) + this.level + 10),
-      atk: Math.floor(((2 * this.baseStats["atk"] + this.ivs["atk"] * this.level) / 100) + 5 * (this.nature.buff === "atk" ? 1.1 : 1 || this.nature.nerf === "atk" ? 0.9 : 1)),
-      def: Math.floor(((2 * this.baseStats["def"] + this.ivs["def"] * this.level) / 100) + 5 * (this.nature.buff === "def" ? 1.1 : 1 || this.nature.nerf === "def" ? 0.9 : 1)),
-      spe: Math.floor(((2 * this.baseStats["spe"] + this.ivs["spe"] * this.level) / 100) + 5 * (this.nature.buff === "spe" ? 1.1 : 1 || this.nature.nerf === "spe" ? 0.9 : 1)),
-      spa: Math.floor(((2 * this.baseStats["spa"] + this.ivs["spa"] * this.level) / 100) + 5 * (this.nature.buff === "spa" ? 1.1 : 1 || this.nature.nerf === "spa" ? 0.9 : 1)),
-      spd: Math.floor(((2 * this.baseStats["spd"] + this.ivs["spd"] * this.level) / 100) + 5 * (this.nature.buff === "spd" ? 1.1 : 1 || this.nature.nerf === "spd" ? 0.9 : 1)),
+      hp: Math.floor(((2 * this.baseStats["hp"] + this.ivs["hp"]) * this.level / 100) + this.level + 10),
+      atk: Math.floor(((2 * this.baseStats["atk"] + this.ivs["atk"]) * this.level / 100) + 5 * (this.nature.bonus === "atk" ? 1.1 : 1) * (this.nature.penalty === "atk" ? 0.9 : 1)),
+      def: Math.floor(((2 * this.baseStats["def"] + this.ivs["def"]) * this.level / 100) + 5 * (this.nature.bonus === "def" ? 1.1 : 1) * (this.nature.penalty === "def" ? 0.9 : 1)),
+      spe: Math.floor(((2 * this.baseStats["spe"] + this.ivs["spe"]) * this.level / 100) + 5 * (this.nature.bonus === "spe" ? 1.1 : 1) * (this.nature.penalty === "spe" ? 0.9 : 1)),
+      spa: Math.floor(((2 * this.baseStats["spa"] + this.ivs["spa"]) * this.level / 100) + 5 * (this.nature.bonus === "spa" ? 1.1 : 1) * (this.nature.penalty === "spa" ? 0.9 : 1)),
+      spd: Math.floor(((2 * this.baseStats["spd"] + this.ivs["spd"]) * this.level / 100) + 5 * (this.nature.bonus === "spd" ? 1.1 : 1) * (this.nature.penalty === "spd" ? 0.9 : 1)),
     };
     // Battle Stats (hitPoints represents the real value that will change during battle, abm represents any ability multipliers, acc represents the hidden accuracty stat, and eva the hidden evasion stat)
     this.battleStats = {
@@ -84,22 +84,43 @@ class POKEMON {
   };
 
   levelUp() {
+    // 1/50 Base Stat Val
+    // 1/100 Total IV Val
     this.level++;
-    console.log(this.level);
-    const hpGain = Math.floor(((2 * this.baseStats["hp"] + this.ivs["hp"] * this.level) / 100) - this.level + 10) - this.stats.hp;
-    const atkGain = Math.floor(((2 * this.baseStats["atk"] + this.ivs["atk"] * this.level) / 100) + 5 * (this.nature.buff === "atk" ? 1.1 : 1 || this.nature.nerf === "atk" ? 0.9 : 1)) - this.stats.atk;
-    const defGain = Math.floor(((2 * this.baseStats["def"] + this.ivs["def"] * this.level) / 100) + 5 * (this.nature.buff === "def" ? 1.1 : 1 || this.nature.nerf === "def" ? 0.9 : 1)) - this.stats.def;
-    const speGain = Math.floor(((2 * this.baseStats["spe"] + this.ivs["spe"] * this.level) / 100) + 5 * (this.nature.buff === "spe" ? 1.1 : 1 || this.nature.nerf === "spe" ? 0.9 : 1)) - this.stats.spe;
-    const spaGain = Math.floor(((2 * this.baseStats["spa"] + this.ivs["spa"] * this.level) / 100) + 5 * (this.nature.buff === "spa" ? 1.1 : 1 || this.nature.nerf === "spa" ? 0.9 : 1)) - this.stats.spa;
-    const spdGain = Math.floor(((2 * this.baseStats["spd"] + this.ivs["spd"] * this.level) / 100) + 5 * (this.nature.buff === "spd" ? 1.1 : 1 || this.nature.nerf === "spd" ? 0.9 : 1)) - this.stats.spd;
+    this.reCalcStats();
+    const { hp, atk, def, spe, spa, spd } = this.ivs;
+    const baseBonus = {
+      "hp": Math.floor(this.stats.hp / 50),
+      "atk": Math.floor(this.stats.atk / 50),
+      "def": Math.floor(this.stats.def / 50),
+      "spe": Math.floor(this.stats.spe / 50),
+      "spa": Math.floor(this.stats.spa / 50),
+      "spd": Math.floor(this.stats.spd / 50)
+    };
+    const ivBonus = Math.ceil((hp + atk + def + spe + spa + spd) / 100)
+    this.stats.hp += baseBonus["hp"] + ivBonus;
+    this.stats.atk += baseBonus["atk"] + ivBonus;
+    this.stats.def += baseBonus["def"] + ivBonus;
+    this.stats.spe += baseBonus["spe"] + ivBonus;
+    this.stats.spa += baseBonus["spa"] + ivBonus;
+    this.stats.spa += baseBonus["spd"] + ivBonus;
     return {
-      hpGain,
-      atkGain,
-      defGain,
-      speGain,
-      spaGain,
-      spdGain,
+      "hp": baseBonus["hp"] + ivBonus,
+      "atk": baseBonus["atk"] + ivBonus,
+      "def": baseBonus["def"] + ivBonus,
+      "spe": baseBonus["spe"] + ivBonus,
+      "spa": baseBonus["spa"] + ivBonus,
+      "spd": baseBonus["spd"] + ivBonus,
     }
+  }
+
+  reCalcStats() {
+    this.stats.hp = Math.floor(((2 * this.baseStats["hp"] + this.ivs["hp"]) * this.level / 100) + this.level + 10)
+    this.stats.atk = Math.floor(((2 * this.baseStats["atk"] + this.ivs["atk"]) * this.level / 100) + 5 * (this.nature.bonus === "atk" ? 1.1 : 1) * (this.nature.penalty === "atk" ? 0.9 : 1))
+    this.stats.def = Math.floor(((2 * this.baseStats["def"] + this.ivs["def"]) * this.level / 100) + 5 * (this.nature.bonus === "def" ? 1.1 : 1) * (this.nature.penalty === "def" ? 0.9 : 1))
+    this.stats.spe = Math.floor(((2 * this.baseStats["spe"] + this.ivs["spe"]) * this.level / 100) + 5 * (this.nature.bonus === "spe" ? 1.1 : 1) * (this.nature.penalty === "spe" ? 0.9 : 1))
+    this.stats.spa = Math.floor(((2 * this.baseStats["spa"] + this.ivs["spa"]) * this.level / 100) + 5 * (this.nature.bonus === "spa" ? 1.1 : 1) * (this.nature.penalty === "spa" ? 0.9 : 1))
+    this.stats.spd = Math.floor(((2 * this.baseStats["spd"] + this.ivs["spd"]) * this.level / 100) + 5 * (this.nature.bonus === "spd" ? 1.1 : 1) * (this.nature.penalty === "spd" ? 0.9 : 1))
   }
 
   applyNickname(value) {
