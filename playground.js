@@ -4,6 +4,8 @@ const { BATTLE } = require('./battle');
 const { ACTION } = require('./action');
 const { weathers } = require('./weather');
 const { overgrow } = require('./ability');
+const { expGraphs } = require('./expGraphs');
+const { rareCandy } = require('./items');
 
 const lars = new PKMN_TRAINER(
   "Lars",
@@ -35,6 +37,7 @@ const charizard = new POKEMON(
   36,
   null,
   null,
+  expGraphs.erratic,
   1,
   null,
   null,
@@ -44,19 +47,15 @@ const charizard = new POKEMON(
 // console.log(bulbasaur);
 // console.log(bulbasaur);
 
-console.log(charizard)
-console.log(charizard.nature);
-console.log(charizard.stats);
-console.log(charizard.levelUp());
-console.log(charizard.levelUp());
-console.log(charizard.levelUp());
-console.log(charizard.levelUp());
-console.log(charizard.levelUp());
-console.log(charizard.levelUp());
-console.log(charizard.levelUp());
-console.log(charizard.levelUp());
-console.log(charizard.levelUp());
-console.log(charizard.stats);
+console.log(charizard.giveExp());
+console.log("CHARIZARD'S LEVEL:: ", charizard.level);
+console.log("CHARIZARD'S EXP:: ", charizard.exp);
+console.log("TO NEXT LEVEL:: ", charizard.expGrowth[charizard.level].toNext);
+console.log(charizard.gainExp(6000));
+console.log("CHARIZARD'S LEVEL:: ", charizard.level);
+console.log(rareCandy.use(charizard));
+console.log("RARE CANDY LEVEL:: ", charizard.level)
+console.log("CHARIZARD'S EXP:: ", charizard.exp);
 
 
 

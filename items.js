@@ -70,8 +70,21 @@ const rareCandy = new MEDICINE(
   "rarecandy",
   "A rare sweet with strengthening properties. Raises a Pokemon's level by 1.",
   ((pokemon) => {
-    expGain = pokemon.expGain[pokemon.level + 1] - pokemon.exp;
-    pokemon.exp += expGain;
-    pokemon.levelUp();
-  })
+    // If the Pokemon's level is 100
+    if (pokemon.level === 100) {
+      // Return false (Item fails)
+      return false;
+    }
+    // Calculate the exp difference needed to level up with no overflow to the exp bar
+    const diff = pokemon.expGrowth[pokemon.level].toNext - pokemon.exp;
+    // Call gainExp on Pokemon with diff fed into it
+    pokemon.gainExp(diff);
+    // Return true (Item succeeds)
+    return true;
+  }),
+  null,
+  {
+    "failure": "It had no effect!",
+    "success": "The Rare Candy made the Pokemon level up!"
+  }
 )

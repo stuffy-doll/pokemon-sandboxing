@@ -4,7 +4,7 @@ const { hpTypes } = require('./hpTypes');
 // POKEMON
 
 class POKEMON {
-  constructor(dexNo, name, sexless, species, baseStats, types, level, learnset, ability, catchRate, evolvesFrom, evolvesTo) {
+  constructor(dexNo, name, sexless, species, baseStats, types, level, learnset, ability, expGraph, catchRate, evolvesFrom, evolvesTo) {
     this.dexNo = dexNo;
     this.name = name;
     this.sexless = sexless;
@@ -51,9 +51,8 @@ class POKEMON {
     this.hiddenPowerType = hpTypes[this.hiddenPowerCalc()]; // Calls the method to determine hidden power type based on IV spread
     this.ability = ability;
     this.ot = null; // Method will assign trainer when caught
-    this.exp = null; // TODO: Figure out calculation based on level
-    this.toNext = null; // TODO: Figure out calculation to handle Exp
-    // Status effect for use in battle.
+    this.expGrowth = expGraph;
+    this.exp = null; // Super sad about this...
     this.status = { "current": null, multiplier: 1 };
     this.heldItem = null;
     this.ribbons = [];
@@ -83,12 +82,40 @@ class POKEMON {
     return sum;
   };
 
+  // Method for initializing EXP. Couldn't get it to work in constructor LOL
+  giveExp() {
+    this.exp = this.expGrowth[this.level - 1].toNext;
+    return;
+  }
+
+  // Gaining EXP
+  gainExp(exp) {
+    // Track the required amount of exp to the next level
+    const toNext = this.expGrowth[this.level].toNext;
+    // Track whether the pokemon leveled up or not.
+    let didLevel = false;
+    // Track current EXP (May not need)
+    const currExp = this.exp;
+    // Add the gained exp to the Pokemon's total exp
+    this.exp += exp;
+    // If the exp is greater than or equal to the required toNext value
+    if (this.exp >= toNext) {
+      // Call Level Up
+      didLevel = true;
+      this.levelUp();
+    };
+    // Return a brief message (To Place in Battle Log)
+    return didLevel ? `${this.nickname ? this.nickname : this.name} gained ${exp} and leveled up!` : `${this.nickname ? this.nickname : this.name} gained ${exp} EXP!`;
+  }
+
   levelUp() {
-    // 1/50 Base Stat Val
-    // 1/100 Total IV Val
+    // Increase the Pokemon's Level
     this.level++;
+    // Recalculate stats based on new level
     this.reCalcStats();
+    // Break down IVs for a succinct formula
     const { hp, atk, def, spe, spa, spd } = this.ivs;
+    // Each stat divided by 50 will provide the bonus, stored in an object for ease of use
     const baseBonus = {
       "hp": Math.floor(this.stats.hp / 50),
       "atk": Math.floor(this.stats.atk / 50),
@@ -97,7 +124,9 @@ class POKEMON {
       "spa": Math.floor(this.stats.spa / 50),
       "spd": Math.floor(this.stats.spd / 50)
     };
+    // Total IV value divided by 100 to provide bonus
     const ivBonus = Math.ceil((hp + atk + def + spe + spa + spd) / 100)
+    // Each stat is given the bonus for levelling up (BASE/50 + IVTOTAL/100)
     this.stats.hp += baseBonus["hp"] + ivBonus;
     this.stats.atk += baseBonus["atk"] + ivBonus;
     this.stats.def += baseBonus["def"] + ivBonus;
