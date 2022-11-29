@@ -15,6 +15,30 @@ class BATTLE {
     this.fleeAttempts = 0
   };
 
+  commitTurn(xAction, yAction) {
+    const turn = this.turnCount;
+    const logTurn = { turn: [] }
+    const xType = xAction.type;
+    const yType = yAction.type;
+    if (xType === "flee") {
+      const fled = this.determineFlee();
+      if (fled.outcome === true) {
+        logTurn.turn.push(fled.message);
+        terminateBattle();
+      } else {
+        this.fleeAttempts++;
+      }
+    } else if (xType === "ball") {
+      const caught = this.activeTrainer.throwBall(xAction.act, this.activeOpponent)
+      if (caught.outcome === true) {
+        logTurn.turn.push(caught.message);
+        terminateBattle();
+      }
+    } else if (xType === "item") {
+      const used = xAction.act.use(this.activeTeam);
+    }
+  };
+
   // The field is checked. Some fields will persist, such as fields where the overworld applies a persistant weather to the battle
   checkField() {
     // If no field, then return

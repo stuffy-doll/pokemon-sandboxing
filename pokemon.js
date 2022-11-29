@@ -123,9 +123,9 @@ class POKEMON {
       "spe": Math.floor(this.stats.spe / 50),
       "spa": Math.floor(this.stats.spa / 50),
       "spd": Math.floor(this.stats.spd / 50)
-    };
+    }
     // Total IV value divided by 100 to provide bonus
-    const ivBonus = Math.ceil((hp + atk + def + spe + spa + spd) / 100)
+    const ivBonus = Math.ceil((hp + atk + def + spe + spa + spd) / 100);
     // Each stat is given the bonus for levelling up (BASE/50 + IVTOTAL/100)
     this.stats.hp += baseBonus["hp"] + ivBonus;
     this.stats.atk += baseBonus["atk"] + ivBonus;
@@ -141,7 +141,7 @@ class POKEMON {
       "spa": baseBonus["spa"] + ivBonus,
       "spd": baseBonus["spd"] + ivBonus,
     }
-  }
+  };
 
   reCalcStats() {
     this.stats.hp = Math.floor(((2 * this.baseStats["hp"] + this.ivs["hp"]) * this.level / 100) + this.level + 10)
@@ -150,7 +150,7 @@ class POKEMON {
     this.stats.spe = Math.floor(((2 * this.baseStats["spe"] + this.ivs["spe"]) * this.level / 100) + 5 * (this.nature.bonus === "spe" ? 1.1 : 1) * (this.nature.penalty === "spe" ? 0.9 : 1))
     this.stats.spa = Math.floor(((2 * this.baseStats["spa"] + this.ivs["spa"]) * this.level / 100) + 5 * (this.nature.bonus === "spa" ? 1.1 : 1) * (this.nature.penalty === "spa" ? 0.9 : 1))
     this.stats.spd = Math.floor(((2 * this.baseStats["spd"] + this.ivs["spd"]) * this.level / 100) + 5 * (this.nature.bonus === "spd" ? 1.1 : 1) * (this.nature.penalty === "spd" ? 0.9 : 1))
-  }
+  };
 
   applyNickname(value) {
     this.nickname = value;

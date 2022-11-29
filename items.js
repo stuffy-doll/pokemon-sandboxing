@@ -1,25 +1,22 @@
-class GENERAL_ITEM {
-  constructor(name, shorthand, description,)
-}
-
 // MEDICINE
 
 class MEDICINE {
-  constructor(name, shorthand, description, effect, price, messages) {
+  constructor(name, shorthand, description, effect, price) {
     this.name = name;
     this.shorthand = shorthand;
     this.description = description;
     this.effect = effect;
     this.price = price;
-    this.messages = messages;
+    this.success = null;
+    this.failure = null;
   };
 
   use(pokemon) {
     const final = this.effect(pokemon);
     if (!final) {
-      return this.messages.failure;
+      return this.failure;
     };
-    return this.messages.success;
+    return this.success;
   };
 };
 
@@ -29,19 +26,17 @@ const potion = new MEDICINE(
   "Basic Medicine that restores a small amount of a Pokemon's HP.",
   ((pokemon) => {
     if (pokemon.hitPoints === pokemon.stats.hp) {
+      this.failure = `${pokemon.nickname ? pokemon.nickname : pokemon.name}'s HP is full!`;
       return false;
     };
     pokemon.hitPoints += 20;
     if (pokemon.hitPoints > pokemon.stats.hp) {
       pokemon.hitPoints = pokemon.stats.hp;
     };
+    this.success = `Some of ${pokemon.nickname ? pokemon.nickname : pokemon.name}'s HP was restored!`;
     return true;
   }),
   200,
-  {
-    "failure": "The Pokemon's HP is full!",
-    "success": "The Pokemon restored 20 HP!"
-  }
 );
 
 const superPotion = new MEDICINE(
@@ -88,3 +83,5 @@ const rareCandy = new MEDICINE(
     "success": "The Rare Candy made the Pokemon level up!"
   }
 )
+
+module.exports.potion = potion;

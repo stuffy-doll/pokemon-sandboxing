@@ -1,20 +1,7 @@
 class ACTION {
-  constructor(type, move, ball, item, swap) {
+  constructor(type, act) {
     this.type = type;
-    this.move = move;
-    this.ball = ball;
-    this.item = item;
-    this.swap = swap;
-  };
-
-  toSafeObject() {
-    return {
-      "type": this.type,
-      "move": this.move,
-      "ball": this.ball,
-      "item": this.item,
-      "swap": this.swap
-    };
+    this.act = act;
   };
 };
 

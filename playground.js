@@ -5,7 +5,7 @@ const { ACTION } = require('./action');
 const { weathers } = require('./weather');
 const { overgrow } = require('./ability');
 const { expGraphs } = require('./expGraphs');
-const { rareCandy } = require('./items');
+const { potion } = require('./items');
 
 const lars = new PKMN_TRAINER(
   "Lars",
@@ -53,10 +53,10 @@ console.log("CHARIZARD'S EXP:: ", charizard.exp);
 console.log("TO NEXT LEVEL:: ", charizard.expGrowth[charizard.level].toNext);
 console.log(charizard.gainExp(6000));
 console.log("CHARIZARD'S LEVEL:: ", charizard.level);
-console.log(rareCandy.use(charizard));
+console.log(potion.use(charizard));
 console.log("RARE CANDY LEVEL:: ", charizard.level)
 console.log("CHARIZARD'S EXP:: ", charizard.exp);
-
+console.log(potion)
 
 
 const permaWeathers = Object.values(weathers).splice(0, 6);
