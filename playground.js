@@ -5,11 +5,9 @@ const { ACTION } = require('./action');
 const { weathers } = require('./weather');
 const { overgrow } = require('./ability');
 const { expGraphs } = require('./expGraphs');
-const { potion } = require('./items');
 const { moves } = require('./move');
-const { rareCandy } = require('./items');
-const { xAtk } = require('./items');
 const { utils } = require('./utilities');
+const { pokeball } = require('./items');
 
 const lars = new PKMN_TRAINER(
   "Lars",
@@ -54,17 +52,20 @@ const charizard = new POKEMON(
 charizard.moves[1] = moves.flameThrower;
 charizard.applyNickname("Giganto")
 
-console.log(charizard.stats.atk)
+const charAction = new ACTION(
+  "fight",
+  charizard.moves[1]
+);
 
-console.log(utils.calcStage(charizard, "atk", "+2"));
-console.log(utils.calcStage(charizard, "atk", "-2"));
-console.log(utils.calcStage(charizard, "atk", "-2"));
-console.log(utils.calcStage(charizard, "atk", "-2"));
-console.log(utils.calcStage(charizard, "atk", "-2"));
-console.log(utils.calcStage(charizard, "atk", "-2"));
+const bulbAction = new ACTION(
+  "ball",
+  pokeball,
+)
+
 
 
 const testBattle = new BATTLE(lars, bulbasaur, charizard, weathers.rain);
+testBattle.commitTurn(charAction, bulbAction);
 // console.log(testBattle.calcDamage(charizard, bulbasaur, charizard.moves[1]))
 
 const permaWeathers = Object.values(weathers).splice(0, 6);

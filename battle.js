@@ -1,3 +1,5 @@
+const { utils } = require('./utilities');
+
 // BATTLE
 
 /*
@@ -11,41 +13,60 @@ class BATTLE {
     this.activeOpponent = activeOpponent;
     this.field = field;
     this.turnCount = 0;
-    this.log = [];
+    this.log = {};
     this.fleeAttempts = 0
   };
 
-  commitAction(action) {
+  commitTurn(xAction, yAction) {
+    const allyLog = this.commitAction(this.activeTeam, this.activeOpponent, yAction);
+    const foeLog = this.commitAction(this.activeOpponent, this.activeTeam, xAction);
+    console.log(allyLog, foeLog)
+  }
+
+  commitAction(who, target, action) {
     const type = action.type;
     const act = action.act;
 
-    const actionLog = [];
+    const log = {
+      "actionLog": [],
+      "damage": null,
+    };
 
     if (type === "flee") {
-      const fled = this.determineFlee();
+      const fled = this.determineFlee(who, target);
       if (fled.outcome) {
-        actionLog.push(fled.message);
+        log.actionLog.push(fled.message);
         this.terminateBattle();
-        return actionLog;
+        return log;
       } else {
-        actionLog.push(fled.message);
-        return actionLog;
+        log.actionLog.push(fled.message);
+        return log;
       }
     } else if (type === "ball") {
+      log.actionLog.push(`${this.activeTrainer.name} threw the ${act.name}.`)
       const caught = this.activeTrainer.throwBall(act, this.activeOpponent);
       if (caught.outcome) {
-        actionLog.push(caught.message);
+        log.actionLog.push(caught.message);
         this.terminateBattle();
-        return actionLog;
+        return log;
       } else {
-        actionLog.push(caught.message);
-        return actionLog;
+        log.actionLog.push(caught.message);
+        return log;
       }
     } else if (type === "item") {
-
+      log.actionLog.push(`${this.activeTrainer.name} used the ${act.name}.`);
+      log.actionLog.push(act.use(who));
+      return log;
+    } else {
+      log.actionLog.push(`${utils.pokemonName(who)} used ${act.name}!`)
+      const fight = this.calcDamage(who, target, act);
+      log.actionLog.push(`${fight.message ? fight.message : null}`);
+      log.damage = fight.damage;
+      return log;
     }
   };
 
+  // Use in Commit Action
   calcDamage(attacker, target, action) {
     // Weather
     const W = this.determineWeatherMultipliers(action.type)
@@ -59,15 +80,19 @@ class BATTLE {
     const CRIT = Math.floor(Math.random() * 255) > Math.floor(Math.random() * 255) ? 2 : 1;
     // Type Effectiveness
     const TYPE = this.determineTypeMultiplier(action, target).multiplier;
+    const message = this.determineTypeMultiplier(action, target).message;
     // Attacker's Attack Value
     const A = action.cata === "Physical" ? attacker.stats.atk : attacker.stats.spa;
     // Defender's Defense Value
     const D = action.cata === "Physical" ? target.stats.def : target.stats.spd;
-    console.log(`LEVEL: ${attacker.level}, W: ${W}, STAB: ${STAB}, Power: ${Power}, BURN: ${BURN}, CRIT: ${CRIT}, TYPE: ${TYPE}, A: ${A}, D: ${D}`)
     const damage = Math.floor(((2 * attacker.level / 5 + 2) * Power * A / D / 50) * BURN * W + 2) * CRIT * STAB * TYPE;
-    return damage;
+    return {
+      damage,
+      message
+    };
   }
 
+  // Use in Commit Turn
   checkPriority(xAction, yAction) {
     let allyGoesFirst = false;
     if (this.activeTeam.stats.spe > this.activeOpponent.stats.spe || xAction.act.priority > yAction.act.priority) {
@@ -170,8 +195,6 @@ class BATTLE {
     // Storing types
     const moveType = attack.type;
     const targetTypes = target.types;
-    console.log(superEffective[moveType])
-    console.log(targetTypes)
 
     // If the target only has one type
     if (targetTypes.length === 1) {
@@ -195,11 +218,9 @@ class BATTLE {
       };
       // If the target has two types...
     } else if (targetTypes.length > 1) {
-      console.log("HIT")
       // If either of the target's types are found in the noEffect graph (by move type)
       if (noEffect[moveType].includes(targetTypes[0]) || noEffect[moveType].includes(targetTypes[1])) {
         // Return the following
-        console.log("HIT!")
         result.message = "It had no effect..."
         result.noEffect = true;
         return result;
@@ -265,27 +286,27 @@ class BATTLE {
     return result;
   };
 
-  determineFlee() {
+  determineFlee(runner, opposer) {
     // Declare a result for the calculation and initialize it as false
     const result = {
       "outcome": false,
       "message": "You couldn't get away!"
     }
     // If the opponent has an OT (Meaning the battle is a trainer battle).
-    if (this.activeOpponent.ot) {
+    if (opposer.ot) {
       // Return a false result with a message explaining.
       result.message = "No! There's no running from a trainer battle!"
       return result;
     };
     // If the active team partner's speed is greater than that of the opponent's OR the active team partner is holding the Smoke Ball
-    if (this.activeTeam.stats.spe >= this.activeOpponent.stats.spe || this.activeTeam.heldItem.name === "Smoke Ball") {
+    if (runner.spe >= opposer.stats.spe || (runner.heldItem && runner.heldItem.name === "Smoke Ball")) {
       // NOTE: Seperate the Smoke Ball to provide a unique message to an escape.
       result.outcome = true;
       result.message = "You got away safely!"
       return result;
     };
     // Calculate the odds of escaping: Escape = Math.sqrt(TEAMSPEED * 32 / Math.sqrt(WILDSPEED / 4) MOD 256) + 30 * ATTEMPTS
-    const escape = Math.sqrt(this.activeTeam.stats.spe * 32 / Math.sqrt(this.activeOpponent.stats.spe / 4) % 256) + 30 * this.fleeAttempts;
+    const escape = Math.sqrt(runner.stats.spe * 32 / Math.sqrt(opposer.stats.spe / 4) % 256) + 30 * this.fleeAttempts;
     // If the escape odds are greater than the flat escape rate
     if (escape > 255) {
       result.outcome = true;

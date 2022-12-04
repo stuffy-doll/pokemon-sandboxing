@@ -1,5 +1,32 @@
 // Experience Growth Rate Graphs
 
+/*
+Medium-Fast Exp Growth Formula = EXP = level^3 (level x level x level)
+*/
+const mediumFastGen = () => {
+  // Object to return
+  const mediumFast = {};
+  // Store the ToNext value, which is the TOTAL EXP needed to reach the next level
+  let toNext = 8
+  // Loop through levels up to 100
+  for (let level = 1; level <= 100; level++) {
+    // If the level is 100, toNext should be null, then break.
+    if (level === 100) {
+      mediumFast[level] = { toNext: null };
+      break;
+    };
+    // Store the level as key, toNext as the value
+    mediumFast[level] = { toNext: toNext };
+    // The Math. Reassign toNext to level + 2 cubed
+    toNext = Math.pow(level + 2, 3);
+  }
+  // Return the Exp Growth for Pokémon to use.
+  return mediumFast;
+};
+
+const mediumFast = mediumFastGen();
+console.log(mediumFast);
+
 const erratic = {
   1: { toNext: 15 },
   2: { toNext: 52 },
@@ -9,7 +36,6 @@ const erratic = {
   6: { toNext: 637 },
   7: { toNext: 942 },
   8: { toNext: 1326 },
-  // And so on...
   9: { toNext: 1800 },
   10: { toNext: 2369 },
   11: { toNext: 3041 },

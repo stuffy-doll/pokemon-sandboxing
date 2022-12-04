@@ -1,12 +1,13 @@
-const { pokemonName } = require('./utilities');
+const { utils } = require('./utilities')
 
 // ITEMS
 
 class ITEM {
-  constructor(name, shorthand, description, sell) {
+  constructor(name, shorthand, description, price, sell) {
     this.name = name;
     this.shorthand = shorthand;
     this.description = description;
+    this.price = price;
     this.sell = sell;
   };
 }
@@ -15,21 +16,15 @@ class ITEM {
 
 class BATTLE_ITEM extends ITEM {
   constructor(name, shorthand, description, effect, sell, price) {
-    super(name, shorthand, description, sell);
+    super(name, shorthand, description, price, sell);
     this.effect = effect;
-    this.price = price;
-    this.sell = sell;
     this.message = null;
   };
 
   use(pokemon) {
     const final = this.effect(pokemon);
-    if (!final) {
-      return "The stat can't go up any higher!";
-    } else {
-      this.message = final;
-      return this.message
-    }
+    this.message = final;
+    return final;
   }
 }
 
@@ -37,9 +32,8 @@ class BATTLE_ITEM extends ITEM {
 
 class MEDICINE extends ITEM {
   constructor(name, shorthand, description, effect, price, sell) {
-    super(name, shorthand, description, sell)
+    super(name, shorthand, description, price, sell)
     this.effect = effect;
-    this.price = price;
     this.message = null;
   };
 
@@ -54,6 +48,24 @@ class MEDICINE extends ITEM {
   };
 };
 
+// BALL
+
+class BALL extends ITEM {
+  constructor(name, shorthand, description, price, sell, multiplier) {
+    super(name, shorthand, description, price, sell);
+    this.multiplier = multiplier;
+  }
+}
+
+const pokeball = new BALL(
+  "Poké Ball",
+  "pokeball",
+  "A regular poké ball used to catch wild Pokémon.",
+  200,
+  20,
+  1
+)
+
 const potion = new MEDICINE(
   "Potion",
   "potion",
@@ -67,10 +79,10 @@ const potion = new MEDICINE(
     if (pokemon.battleStats.hitPoints > pokemon.stats.hp) {
       const diff = pokemon.battleStats.hitPoints - pokemon.stats.hp;
       pokemon.battleStats.hitPoints = pokemon.stats.hp;
-      message = `${pokemonName(pokemon)} restored ${diff} HP!`
+      message = `${utils.pokemonName(pokemon)} restored ${diff} HP!`
       return message;
     };
-    message = `${pokemonName(pokemon)} restored 20 HP!`
+    message = `${utils.pokemonName(pokemon)} restored 20 HP!`
     return message;
   }),
   200,
@@ -90,10 +102,10 @@ const superPotion = new MEDICINE(
     if (pokemon.battleStats.hitPoints > pokemon.stats.hp) {
       const diff = pokemon.battleStats.hitPoints - pokemon.stats.hp;
       pokemon.battleStats.hitPoints = pokemon.stats.hp;
-      message = `${pokemonName(pokemon)} restored ${diff} HP!`
+      message = `${utils.pokemonName(pokemon)} restored ${diff} HP!`
       return message;
     };
-    message = `${pokemonName(pokemon)} restored 20 HP!`
+    message = `${utils.pokemonName(pokemon)} restored 20 HP!`
     return message;
   }),
   500,
@@ -105,12 +117,8 @@ const xAtk = new BATTLE_ITEM(
   "xatk",
   "A supplement that temporarily increases a Pokémon's ATK stat in battle.",
   ((pokemon) => {
-    const capped = pokemon.checkStatCap("atk");
-    if (capped) {
-      return `${pokemonName(pokemon)}'s ATK stat can't go up any higher!`
-    }
-    pokemon.stats.atk = Math.floor(pokemon.stats.atk * 1.4);
-    return `${pokemonName(pokemon)}'s ATK stat went up by 1 stage!`
+    const message = utils.calcStage(pokemon, "atk", "+2");
+    return message;
   }),
   700,
   100
@@ -131,7 +139,7 @@ const rareCandy = new MEDICINE(
     const diff = pokemon.expGrowth[pokemon.level].toNext - pokemon.exp;
     // Call gainExp on Pokemon with diff fed into it
     pokemon.gainExp(diff);
-    message = `${pokemonName(pokemon)} gained ${diff} EXP and leveled up!`
+    message = `${utils.pokemonName(pokemon)} gained ${diff} EXP and leveled up!`
     // Return true (Item succeeds)
     return message;
   }),
@@ -142,3 +150,4 @@ const rareCandy = new MEDICINE(
 module.exports.potion = potion;
 module.exports.rareCandy = rareCandy;
 module.exports.xAtk = xAtk;
+module.exports.pokeball = pokeball;
