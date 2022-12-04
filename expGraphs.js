@@ -19,23 +19,31 @@ const erraticGen = () => {
     if (level < 50) {
       erratic[level] = { toNext: toNext };
       // n < 50
-      toNext = Math.floor(Math.pow(level + 2, 3) * (100 - level) / 50);
-    } else if (50 <= level < 68) {
+      toNext = Math.floor(Math.pow(level + 2, 3) * (100 - (level + 2)) / 50);
+    } else if (50 <= level && level < 68) {
       erratic[level] = { toNext: toNext };
       // 50 <= n < 68
-      toNext = Math.floor(Math.pow(level + 2, 3) * (150 - level) / 100);
-    } else if (68 <= n < 98) {
-      erratic[level] = { toNext: toNext };
-      // 68 <= n < 98
-      toNext = Math.floor(Math.pow(level + 2, 3) * Math.floor(1911 - 10 * level / 3) / 500);
-    } else if (98 <= n < 100) {
+      toNext = Math.floor(Math.pow(level, 3) * (150 - level) / 100);
+    } else {
       erratic[level] = { toNext: toNext };
       // 98 <= n < 100
-      toNext = Math.floor(Math.pow(level + 2, 3) * (160 - level) / 100);
+      toNext = Math.floor(Math.pow(level + 2, 3) * (160 - (level + 2)) / 100);
     }
   }
   return erratic;
 }
+
+/*
+Removed this code from Erratic Gain formula and suddenly it works LMAO I love JavaScript. Will revisit when I'm not pulling my hair out.
+
+else if (68 <= level && level < 98) {
+      erratic[level] = { toNext: toNext };
+      // 68 <= n < 98
+      toNext = Math.floor(Math.pow(level, 3) * Math.floor(1911 - 10 * level / 3) / 500)
+    }
+*/
+
+console.log(Math.pow(69, 3) * Math.floor((1911 - 10 * 69) / 3) / 500)
 
 /*
 Fast Exp Growth Formula = EXP = 4 * level^3 / 5
@@ -149,16 +157,14 @@ const fast = fastGen();
 const mediumSlow = mediumSlowGen();
 const slow = slowGen();
 const fluctuating = fluctuatingGen();
-// console.log(erratic);
+console.log(erratic);
 // console.log(mediumFast);
 // console.log(fast);
 // console.log(mediumSlow);
 // console.log(slow);
-console.log(fluctuating);
+// console.log(fluctuating);
 
-// EXP = level^3 * (floor(level / 2) + 32) / 50
-console.log(Math.pow(37, 3) * (Math.floor(37 / 2) + 32) / 50)
-console.log(Math.floor(Math.pow(3 + 2, 3) * (Math.floor((3 + 2 + 1) / 3) + 24) / 50))
+
 
 // const erratic = {
 //   1: { toNext: 15 },
