@@ -15,29 +15,67 @@ class BATTLE {
     this.fleeAttempts = 0
   };
 
-  commitTurn(xAction, yAction) {
-    const turn = this.turnCount;
-    const logTurn = { turn: [] }
-    const xType = xAction.type;
-    const yType = yAction.type;
-    if (xType === "flee") {
+  commitAction(action) {
+    const type = action.type;
+    const act = action.act;
+
+    const actionLog = [];
+
+    if (type === "flee") {
       const fled = this.determineFlee();
-      if (fled.outcome === true) {
-        logTurn.turn.push(fled.message);
-        terminateBattle();
+      if (fled.outcome) {
+        actionLog.push(fled.message);
+        this.terminateBattle();
+        return actionLog;
       } else {
-        this.fleeAttempts++;
+        actionLog.push(fled.message);
+        return actionLog;
       }
-    } else if (xType === "ball") {
-      const caught = this.activeTrainer.throwBall(xAction.act, this.activeOpponent)
-      if (caught.outcome === true) {
-        logTurn.turn.push(caught.message);
-        terminateBattle();
+    } else if (type === "ball") {
+      const caught = this.activeTrainer.throwBall(act, this.activeOpponent);
+      if (caught.outcome) {
+        actionLog.push(caught.message);
+        this.terminateBattle();
+        return actionLog;
+      } else {
+        actionLog.push(caught.message);
+        return actionLog;
       }
-    } else if (xType === "item") {
-      const used = xAction.act.use(this.activeTeam);
+    } else if (type === "item") {
+
     }
   };
+
+  calcDamage(attacker, target, action) {
+    // Weather
+    const W = this.determineWeatherMultipliers(action.type)
+    // STAB (Same Type Attack Bonus)
+    const STAB = attacker.types.includes(action.type) ? 1.5 : 1;
+    // Move's Power
+    const Power = action.pow;
+    // BURN
+    const BURN = (attacker.status && attacker.status.shorthand === "BRN") ? 0.5 : 1;
+    // Critical Hit Chance
+    const CRIT = Math.floor(Math.random() * 255) > Math.floor(Math.random() * 255) ? 2 : 1;
+    // Type Effectiveness
+    const TYPE = this.determineTypeMultiplier(action, target).multiplier;
+    // Attacker's Attack Value
+    const A = action.cata === "Physical" ? attacker.stats.atk : attacker.stats.spa;
+    // Defender's Defense Value
+    const D = action.cata === "Physical" ? target.stats.def : target.stats.spd;
+    console.log(`LEVEL: ${attacker.level}, W: ${W}, STAB: ${STAB}, Power: ${Power}, BURN: ${BURN}, CRIT: ${CRIT}, TYPE: ${TYPE}, A: ${A}, D: ${D}`)
+    const damage = Math.floor(((2 * attacker.level / 5 + 2) * Power * A / D / 50) * BURN * W + 2) * CRIT * STAB * TYPE;
+    return damage;
+  }
+
+  checkPriority(xAction, yAction) {
+    let allyGoesFirst = false;
+    if (this.activeTeam.stats.spe > this.activeOpponent.stats.spe || xAction.act.priority > yAction.act.priority) {
+      allyGoesFirst = true;
+      return allyGoesFirst;
+    };
+    return allyGoesFirst;
+  }
 
   // The field is checked. Some fields will persist, such as fields where the overworld applies a persistant weather to the battle
   checkField() {
@@ -132,6 +170,8 @@ class BATTLE {
     // Storing types
     const moveType = attack.type;
     const targetTypes = target.types;
+    console.log(superEffective[moveType])
+    console.log(targetTypes)
 
     // If the target only has one type
     if (targetTypes.length === 1) {
@@ -154,10 +194,12 @@ class BATTLE {
         return result;
       };
       // If the target has two types...
-    } else {
+    } else if (targetTypes.length > 1) {
+      console.log("HIT")
       // If either of the target's types are found in the noEffect graph (by move type)
       if (noEffect[moveType].includes(targetTypes[0]) || noEffect[moveType].includes(targetTypes[1])) {
         // Return the following
+        console.log("HIT!")
         result.message = "It had no effect..."
         result.noEffect = true;
         return result;
@@ -168,6 +210,10 @@ class BATTLE {
         result.multiplier = 4;
         return result;
         // If either of the target's types are found in the not effective graph (by move type)
+      } else if (superEffective[moveType].includes(targetTypes[0]) || superEffective[moveType].includes(targetTypes[1])) {
+        result.message = "It's super effective!";
+        result.multiplier = 2;
+        return result;
       } else if (notEffective[moveType].includes(targetTypes[0] || notEffective[moveType].includes(targetTypes[1]))) {
         // Return the following
         result.message = "It's not very effective...";
@@ -252,6 +298,10 @@ class BATTLE {
   battleLog() {
     return this.log;
   };
+
+  terminateBattle() {
+    return this.log;
+  }
 };
 
 module.exports.BATTLE = BATTLE;

@@ -6,11 +6,11 @@ swaps and more.
 */
 
 class MOVE {
-  constructor(name, description, cat, type, acc, pow, pp, ppCap, contact, effects, priority) {
+  constructor(name, description, type, cata, acc, pow, pp, ppCap, contact, effects, priority, target) {
     this.name = name;
     this.description = description;
     this.type = type;
-    this.cat = cat;
+    this.cata = cata;
     this.acc = acc;
     this.pow = pow;
     this.pp = pp;
@@ -19,6 +19,7 @@ class MOVE {
     // Effect checked in battle and applied
     this.effects = effects;
     this.priority = priority;
+    this.target = target
   };
 
 
@@ -59,9 +60,11 @@ const growl = new MOVE(
     // If hasEffect, then the effect is applied
     "effect": ((pokemon) => {
       pokemon.stats.atk = pokemon.stats.atk * 0.9;
+      return `${pokemon.nickname ? pokemon.nickname : pokemon.name}'s `
     })
   },
-  1
+  1,
+  "foe"
 );
 
 const scratch = new MOVE(
@@ -77,5 +80,37 @@ const scratch = new MOVE(
   {
     "hasEffect": false,
   },
-  1
+  1,
+  null
 );
+
+const flameThrower = new MOVE(
+  "Flamethrower",
+  "The user blows intense flames at the opponent. It may cause a burn",
+  "Fire",
+  "Special",
+  90,
+  90,
+  10,
+  15,
+  false,
+  {
+    "hasEffect": true,
+    "effect": ((pokemon) => {
+      const message = null
+      const threshold = 12;
+      const chance = Math.floor(Math.random() * 12);
+      if (chance == threshold) {
+        message = `${pokemon.nickname ? pokemon.nickname : pokemon.name} was burned by the attack!`
+        pokemon.status = burn;
+      }
+      return message;
+    })
+  },
+  1,
+  null
+)
+
+module.exports.moves = {
+  scratch, flameThrower
+}

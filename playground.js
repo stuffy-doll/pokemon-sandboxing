@@ -6,6 +6,10 @@ const { weathers } = require('./weather');
 const { overgrow } = require('./ability');
 const { expGraphs } = require('./expGraphs');
 const { potion } = require('./items');
+const { moves } = require('./move');
+const { rareCandy } = require('./items');
+const { xAtk } = require('./items');
+const { utils } = require('./utilities');
 
 const lars = new PKMN_TRAINER(
   "Lars",
@@ -47,16 +51,20 @@ const charizard = new POKEMON(
 // console.log(bulbasaur);
 // console.log(bulbasaur);
 
-console.log(charizard.giveExp());
-console.log("CHARIZARD'S LEVEL:: ", charizard.level);
-console.log("CHARIZARD'S EXP:: ", charizard.exp);
-console.log("TO NEXT LEVEL:: ", charizard.expGrowth[charizard.level].toNext);
-console.log(charizard.gainExp(6000));
-console.log("CHARIZARD'S LEVEL:: ", charizard.level);
-console.log(potion.use(charizard));
-console.log("RARE CANDY LEVEL:: ", charizard.level)
-console.log("CHARIZARD'S EXP:: ", charizard.exp);
-console.log(potion)
+charizard.moves[1] = moves.flameThrower;
+charizard.applyNickname("Giganto")
 
+console.log(charizard.stats.atk)
+
+console.log(utils.calcStage(charizard, "atk", "+2"));
+console.log(utils.calcStage(charizard, "atk", "-2"));
+console.log(utils.calcStage(charizard, "atk", "-2"));
+console.log(utils.calcStage(charizard, "atk", "-2"));
+console.log(utils.calcStage(charizard, "atk", "-2"));
+console.log(utils.calcStage(charizard, "atk", "-2"));
+
+
+const testBattle = new BATTLE(lars, bulbasaur, charizard, weathers.rain);
+// console.log(testBattle.calcDamage(charizard, bulbasaur, charizard.moves[1]))
 
 const permaWeathers = Object.values(weathers).splice(0, 6);

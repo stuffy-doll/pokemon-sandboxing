@@ -90,6 +90,7 @@ class POKEMON {
 
   // Gaining EXP
   gainExp(exp) {
+    let statReturn;
     // Track the required amount of exp to the next level
     const toNext = this.expGrowth[this.level].toNext;
     // Track whether the pokemon leveled up or not.
@@ -102,10 +103,13 @@ class POKEMON {
     if (this.exp >= toNext) {
       // Call Level Up
       didLevel = true;
-      this.levelUp();
+      statReturn = this.levelUp();
     };
     // Return a brief message (To Place in Battle Log)
-    return didLevel ? `${this.nickname ? this.nickname : this.name} gained ${exp} and leveled up!` : `${this.nickname ? this.nickname : this.name} gained ${exp} EXP!`;
+    return {
+      "message": didLevel ? `${this.nickname ? this.nickname : this.name} gained ${exp} EXP and leveled up!` : `${this.nickname ? this.nickname : this.name} gained ${exp} EXP!`,
+      "bonuses": statReturn,
+    }
   }
 
   levelUp() {
@@ -155,6 +159,15 @@ class POKEMON {
   applyNickname(value) {
     this.nickname = value;
     return;
+  };
+
+  checkStatCap(stat) {
+    let capped = false;
+    const statCap = Math.floor((((2 * this.baseStats[stat] + this.ivs[stat]) * this.level / 100) + 5 * (this.nature.bonus === stat ? 1.1 : 1) * (this.nature.penalty === stat ? 0.9 : 1)) * 2.2)
+    if (this.stats[stat] === statCap) {
+      capped = true;
+    };
+    return capped;
   };
 };
 
