@@ -148,7 +148,7 @@ const fast = fastGen();
 const mediumSlow = mediumSlowGen();
 const slow = slowGen();
 const fluctuating = fluctuatingGen();
-console.log(erratic);
+// console.log(erratic);
 // console.log(mediumFast);
 // console.log(fast);
 // console.log(mediumSlow);

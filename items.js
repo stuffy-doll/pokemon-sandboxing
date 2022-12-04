@@ -51,11 +51,20 @@ class MEDICINE extends ITEM {
 // BALL
 
 class BALL extends ITEM {
-  constructor(name, shorthand, description, price, sell, multiplier) {
+  constructor(name, shorthand, description, price, sell, multiplier, modded, mod) {
     super(name, shorthand, description, price, sell);
     this.multiplier = multiplier;
+    this.modded = modded;
+    this.mod = mod;
+  };
+
+  checkMod(data) {
+    if (this.modded) {
+      return this.mod(data);
+    }
+    return;
   }
-}
+};
 
 const pokeball = new BALL(
   "Poké Ball",
@@ -63,7 +72,58 @@ const pokeball = new BALL(
   "A regular poké ball used to catch wild Pokémon.",
   200,
   20,
-  1
+  1,
+  null,
+  null
+);
+
+const premierBall = new BALL(
+  "Premier Ball",
+  "premball",
+  "A promotional poké ball. No more powerful than a regular poké ball, but it is very stylish.",
+  null,
+  10,
+  1,
+  null,
+  null
+);
+
+const greatBall = new BALL(
+  "Great Ball",
+  "greatball",
+  "A slightly stronger ball used to catch wild Pokémon.",
+  500,
+  50,
+  1.5,
+  null,
+  null
+);
+
+const ultraBall = new BALL(
+  "Ultra Ball",
+  "ultraball",
+  "A very strong ball used to catch wild Pokémon.",
+  2000,
+  100,
+  2,
+  null,
+  null
+);
+
+const healBall = new BALL(
+  "Heal Ball",
+  "healball",
+  "A soothing poké ball that is more successful when a wild pokemon is weakened.",
+  1000,
+  50,
+  1,
+  1.5,
+  ((data) => {
+    if (data.pokemon.battleStats.hitPoints <= data.pokemon.stats.hp) {
+      return true;
+    }
+    return false;
+  })
 )
 
 const potion = new MEDICINE(
@@ -150,4 +210,4 @@ const rareCandy = new MEDICINE(
 module.exports.potion = potion;
 module.exports.rareCandy = rareCandy;
 module.exports.xAtk = xAtk;
-module.exports.pokeball = pokeball;
+module.exports.healBall = healBall;

@@ -110,36 +110,38 @@ class PKMN_TRAINER {
   };
 
   // Throwing a Poke ball at a Pokemon
-  throwBall(ball, pokemon) {
+  throwBall(ball, data) {
     // Result to return
     const result = {
       "outcome": false,
       "message": "Aww! It broke free!"
     };
 
+    const modded = this.checkBallMod(ball, data)
+    console.log(modded);
+
     // Pokemon's Catch Rate
-    const C = pokemon.catchRate;
+    const C = data.pokemon.catchRate;
     // Pokemon's HP Stat
-    const HPMAX = pokemon.stats.hp;
+    const HPMAX = data.pokemon.stats.hp;
     // Pokemon's current Hit Point value
-    const HPCURR = pokemon.battleStats.hitPoints;
+    const HPCURR = data.pokemon.battleStats.hitPoints;
     // The Poke Ball's capture multiplier
-    const BALL = ball.multiplier;
+    const BALL = modded ? ball.modded : ball.multiplier;
     // The Pokemon's status multiplier
-    const STATUS = pokemon.status.multiplier;
-
+    const STATUS = data.pokemon.status.multiplier;
+    console.log("C:: ", C, "HPMAX:: ", HPMAX, "HPCURR:: ", HPCURR, "BALL:: ", BALL, "STATUS:: ", STATUS);
     // The final capture rate formula | RATE = ((3 * HPMAX - 2 * HPCURR) * (C * BALL) / 3 * HPMAX) * STATUS
-    const X = ((3 * HPMAX - 2 * HPCURR) * (C * BALL) / 3 * HPMAX) * STATUS;
+    const X = ((3 * HPMAX - 2 * HPCURR) * (C * BALL) / 3 * HPMAX);
     // A Random catch chance to compare
-    const chance = Math.floor(((65535 / Math.sqrt(Math.sqrt(255 / X))) / 8));
-
+    const chance = Math.floor(((65535 / Math.sqrt(Math.sqrt(255 / X))) / 8)) * STATUS;
     // Calling the capture function
     const caught = this.capture(0, chance);
 
     // If the Pokemon is caught
     if (caught) {
       // Assign the Pokemon to the trainer
-      pokemon.ot = this.info();
+      data.pokemon.ot = this.trainerCard();
       // Tweak results outcome
       result.outcome = true;
       result.message = "Pokemon captured!";
@@ -148,6 +150,15 @@ class PKMN_TRAINER {
     };
 
     return result;
+    // Catch chance is VERY low. Revisit this function
+  };
+
+  checkBallMod(ball, data) {
+    let modded = false;
+    if (ball.modded) {
+      modded = ball.checkMod(data);
+    };
+    return modded;
   };
 
   // Generates a random int for comparing when capturing
@@ -158,21 +169,24 @@ class PKMN_TRAINER {
 
   // Capture functio to determine the capture of a Pokemon
   capture(wobbles = 0, catchChance) {
+
     // Catch chance fed in battle
     // Random Catch Int called
+    // console.log("WOBBLES:: ", wobbles, "CHANCE:: ", catchChance)
     let ranNum = this.randomCatchInt();
+    // console.log("RANNUM:: ", ranNum)
     // Declare return value
     let caught = false;
-    // If the random num is greater than the catch chance
-    if (ranNum >= catchChance) {
-      // Exit with false
-      return caught;
-    };
     // If the wobble count reaches 4
     if (wobbles === 4) {
       // Toggle caught to true
       caught = true;
       // Exit
+      return caught;
+    };
+    // If the random num is greater than the catch chance
+    if (ranNum >= catchChance) {
+      // Exit with false
       return caught;
     };
     // Generate a new Random Number

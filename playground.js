@@ -7,7 +7,8 @@ const { overgrow } = require('./ability');
 const { expGraphs } = require('./expGraphs');
 const { moves } = require('./move');
 const { utils } = require('./utilities');
-const { pokeball } = require('./items');
+const { healBall } = require('./items');
+
 
 const lars = new PKMN_TRAINER(
   "Lars",
@@ -24,7 +25,7 @@ const bulbasaur = new POKEMON(
   5,
   null,
   overgrow,
-  1,
+  45,
   null,
   null,
 )
@@ -40,7 +41,7 @@ const charizard = new POKEMON(
   null,
   null,
   expGraphs.erratic,
-  1,
+  45,
   null,
   null,
 )
@@ -57,15 +58,22 @@ const charAction = new ACTION(
   charizard.moves[1]
 );
 
-const bulbAction = new ACTION(
-  "ball",
-  pokeball,
-)
+// const bulbAction = new ACTION(
+//   "ball",
+//   ultraBall,
+// );
 
+const data = {
+  pokemon: charizard,
+  field: null,
+}
 
+charizard.battleStats.hitPoints = charizard.battleStats.hitPoints / 2 - 4
 
 const testBattle = new BATTLE(lars, bulbasaur, charizard, weathers.rain);
-testBattle.commitTurn(charAction, bulbAction);
+console.log(lars.throwBall(healBall, data));
+console.log(charizard.ot)
+// testBattle.commitTurn(charAction, bulbAction);
 // console.log(testBattle.calcDamage(charizard, bulbasaur, charizard.moves[1]))
 
 const permaWeathers = Object.values(weathers).splice(0, 6);
