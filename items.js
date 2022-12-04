@@ -124,7 +124,23 @@ const healBall = new BALL(
     }
     return false;
   })
-)
+);
+
+const duskBall = new BALL(
+  "Dusk Ball",
+  "duskball",
+  "A ball that is better for catching pokemon in dark environments, such as caves.",
+  1000,
+  50,
+  1,
+  2,
+  ((data) => {
+    if ((data.field && data.field.name === "Moonlight") || data.biome === "Cave") {
+      return true;
+    }
+    return false;
+  })
+);
 
 const potion = new MEDICINE(
   "Potion",
@@ -210,4 +226,4 @@ const rareCandy = new MEDICINE(
 module.exports.potion = potion;
 module.exports.rareCandy = rareCandy;
 module.exports.xAtk = xAtk;
-module.exports.healBall = healBall;
+module.exports.duskBall = duskBall;

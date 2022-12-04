@@ -18,20 +18,23 @@ const erraticGen = () => {
     }
     if (level < 50) {
       erratic[level] = { toNext: toNext };
-      toNext = Math.pow(level + 2, 3) * (100 - level) / 50;
+      // n < 50
+      toNext = Math.floor(Math.pow(level + 2, 3) * (100 - level) / 50);
     } else if (50 <= level < 68) {
       erratic[level] = { toNext: toNext };
-      toNext = Math.pow(level + 2, 3) * (150 - level) / 100;
+      // 50 <= n < 68
+      toNext = Math.floor(Math.pow(level + 2, 3) * (150 - level) / 100);
     } else if (68 <= n < 98) {
       erratic[level] = { toNext: toNext };
-      toNext = Math.pow(level + 2, 3) * Math.floor(1911 - 10 * level / 3) / 500;
+      // 68 <= n < 98
+      toNext = Math.floor(Math.pow(level + 2, 3) * Math.floor(1911 - 10 * level / 3) / 500);
     } else if (98 <= n < 100) {
       erratic[level] = { toNext: toNext };
-      toNext = Math.pow(level + 2, 3) * (160 - level) / 100;
+      // 98 <= n < 100
+      toNext = Math.floor(Math.pow(level + 2, 3) * (160 - level) / 100);
     }
   }
   return erratic;
-  // REVISIT THIS FUNCTION
 }
 
 /*
@@ -90,7 +93,6 @@ const mediumSlowGen = () => {
     toNext = Math.abs(Math.floor(1.2 * Math.pow(level + 2, 3) - 15 * (level ** 2) + (100 * level) - 140));
   }
   return mediumSlow;
-  // RETURN TO THIS FUNCTION
 };
 
 /*
@@ -101,14 +103,13 @@ const slowGen = () => {
   let toNext = 10;
   for (let level = 1; level <= 100; level++) {
     if (level === 100) {
-      mediumSlow[level] = { toNext: null };
+      slow[level] = { toNext: null };
       break;
     };
     slow[level] = { toNext: toNext };
     toNext = Math.floor(5 * Math.pow(level + 2, 3) / 4)
   }
   return slow;
-  // MISSING LEVEL 100 - REVISIT
 };
 
 /*
@@ -129,17 +130,17 @@ const fluctuatingGen = () => {
     }
     if (level < 15) {
       fluctuating[level] = { toNext: toNext };
-      toNext = Math.floor(Math.pow(level + 2, 3) * (Math.floor(level + 1 / 3) + 24) / 50);
-    } else if (15 <= level < 36) {
+      toNext = Math.floor(Math.pow(level + 2, 3) * (Math.floor((level + 2 + 1) / 3) + 24) / 50);
+    } else if ((15 <= level) && level < 36) {
       fluctuating[level] = { toNext: toNext };
-      toNext = Math.floor(Math.pow(level + 2, 3) * (level + 14) / 50);
-    } else if (36 <= n < 100) {
+      toNext = Math.floor(Math.pow(level + 2, 3) * (level + 2 + 14) / 50);
+    } else {
       fluctuating[level] = { toNext: toNext };
-      toNext = Math.floor(Math.pow(level + 2, 3) * (Math.floor(level / 3) + 32) / 50);
+      toNext = Math.floor(Math.pow(level + 2, 3) * (Math.floor((level + 2) / 2) + 32) / 50);
     };
   }
   return fluctuating;
-  // REVISIT THIS FUNCTION
+  // SOLVED
 }
 
 const erratic = erraticGen();
@@ -153,7 +154,11 @@ const fluctuating = fluctuatingGen();
 // console.log(fast);
 // console.log(mediumSlow);
 // console.log(slow);
-// console.log(fluctuating);
+console.log(fluctuating);
+
+// EXP = level^3 * (floor(level / 2) + 32) / 50
+console.log(Math.pow(37, 3) * (Math.floor(37 / 2) + 32) / 50)
+console.log(Math.floor(Math.pow(3 + 2, 3) * (Math.floor((3 + 2 + 1) / 3) + 24) / 50))
 
 // const erratic = {
 //   1: { toNext: 15 },

@@ -7,11 +7,12 @@ Battles intake several pieces of data to create an environment for which two Pok
 */
 
 class BATTLE {
-  constructor(activeTrainer, activeTeam, activeOpponent, field) {
+  constructor(activeTrainer, activeTeam, activeOpponent, field, biome) {
     this.activeTrainer = activeTrainer;
     this.activeTeam = activeTeam;
     this.activeOpponent = activeOpponent;
     this.field = field;
+    this.biome = biome;
     this.turnCount = 0;
     this.log = {};
     this.fleeAttempts = 0
@@ -43,8 +44,13 @@ class BATTLE {
         return log;
       }
     } else if (type === "ball") {
+      const data = {
+        pokemon: this.activeTeam,
+        field: this.field,
+        biome: this.biome
+      };
       log.actionLog.push(`${this.activeTrainer.name} threw the ${act.name}.`)
-      const caught = this.activeTrainer.throwBall(act, this.activeOpponent);
+      const caught = this.activeTrainer.throwBall(act, data);
       if (caught.outcome) {
         log.actionLog.push(caught.message);
         this.terminateBattle();
@@ -90,7 +96,7 @@ class BATTLE {
       damage,
       message
     };
-  }
+  };
 
   // Use in Commit Turn
   checkPriority(xAction, yAction) {
