@@ -76,3 +76,11 @@ const toxic = new STATUS(
     return toxAccum;
   })
 )
+
+module.exports = {
+  burn,
+  paralysis,
+  sleep,
+  poison,
+  toxic,
+}
