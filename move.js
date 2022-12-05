@@ -1,3 +1,12 @@
+const { utils } = require('./utilities');
+const {
+  burn,
+  paralysis,
+  sleep,
+  poison,
+  toxic
+} = require('./status');
+
 // MOVES
 
 /*
@@ -44,73 +53,95 @@ class MOVE {
 
 // Moves
 
-const growl = new MOVE(
-  "Growl",
-  "The user growls in an endearing way, making opposing Pokemon less wary. This lowers their Attack stats.",
+const accupressure = new MOVE(
+  "Accupressure",
+  "The user applies pressure to stress points on their body, sharply boosting one of it's stats.",
   "Normal",
   "Status",
-  100,
   null,
-  40,
-  56,
+  null,
+  30,
+  48,
   false,
   {
-    // hasEffect is checked
     "hasEffect": true,
-    // If hasEffect, then the effect is applied
-    "effect": ((pokemon) => {
-      pokemon.stats.atk = pokemon.stats.atk * 0.9;
-      return `${pokemon.nickname ? pokemon.nickname : pokemon.name}'s `
+    "effect": ((user) => {
+      const stats = ["atk", "def", "spe", "spa", "spd"];
+      const chosen = Math.floor(Math.random() * stats.length);
+      const message = utils.calcStage(user, chosen, "+2");
+      return message;
     })
   },
   1,
-  "foe"
+  "self"
 );
 
-const scratch = new MOVE(
-  "Scratch",
-  "The user scratches with sharp claws.",
+const bellyDrum = new MOVE(
+  "Belly Drum",
+  "The user maximizes its Attack stat in exchange for half of its HP.",
+  "Normal",
+  "Status",
+  null,
+  null,
+  10,
+  16,
+  false,
+  {
+    "hasEffect": true,
+    "effect": ((user) => {
+      const diff = user.battleStats.hitPoints - Math.floor(user.battleStats.hitPoints / 2);
+      user.battleStats.hitPoints -= diff;
+      utils.calcStage(user, "atk", "+6");
+      return `${utils.pokemonName(user)} maximized its Attack stat!`
+    })
+  },
+  1,
+  "self"
+);
+
+const bodySlam = new MOVE(
+  "Body Slam",
+  "The user drops onto the target with its full body weight. This may also cause paralysis.",
   "Normal",
   "Physical",
   100,
-  35,
-  40,
-  56,
+  85,
+  15,
+  24,
+  true,
+  {
+    "hasEffect": true,
+    "effect": ((target) => {
+      const num = Math.floor(Math.random() * 3);
+      if (num === 3) {
+        target.status = paralysis;
+      }
+    })
+  },
+  1,
+  null
+);
+
+const cut = new MOVE(
+  "Cut",
+  "The target is cut with a scythe or claw.",
+  "Normal",
+  "Physical",
+  95,
+  50,
+  30,
+  48,
   true,
   {
     "hasEffect": false,
   },
   1,
   null
-);
-
-const flameThrower = new MOVE(
-  "Flamethrower",
-  "The user blows intense flames at the opponent. It may cause a burn",
-  "Fire",
-  "Special",
-  90,
-  90,
-  10,
-  15,
-  false,
-  {
-    "hasEffect": true,
-    "effect": ((pokemon) => {
-      const message = null
-      const threshold = 12;
-      const chance = Math.floor(Math.random() * 12);
-      if (chance == threshold) {
-        message = `${pokemon.nickname ? pokemon.nickname : pokemon.name} was burned by the attack!`
-        pokemon.status = burn;
-      }
-      return message;
-    })
-  },
-  1,
-  null
 )
 
-module.exports.moves = {
-  scratch, flameThrower
+module.exports.normal = {
+  accupressure,
+  bellyDrum,
+  bodySlam,
+  cut
 }

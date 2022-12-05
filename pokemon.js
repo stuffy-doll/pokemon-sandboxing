@@ -1,5 +1,13 @@
 const { natures } = require('./natures');
 const { hpTypes } = require('./hpTypes');
+const {
+  erratic,
+  fast,
+  slow,
+  mediumFast,
+  mediumSlow,
+  fluctuating
+} = require('./expGraphs');
 
 // POKEMON
 
